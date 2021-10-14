@@ -1,4 +1,5 @@
 ﻿using MathTasks.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -8,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MathTasks.Controllers {
+    [Authorize(Roles = "Administrator")]
     public class RolesController : Controller {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<IdentityUser> _userManager;
@@ -78,7 +80,7 @@ namespace MathTasks.Controllers {
                 return NotFound();
             }
             var userRoles = await _userManager.GetRolesAsync(user);
-            var addedRoles = userRoles.Except(roles);
+            var addedRoles = roles.Except(userRoles);
             var removedRoles = userRoles.Except(roles);
             await _userManager.AddToRolesAsync(user, addedRoles);
             await _userManager.RemoveFromRolesAsync(user, removedRoles);
