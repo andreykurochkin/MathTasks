@@ -1,4 +1,5 @@
 ﻿using MathTasks.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -14,6 +15,7 @@ namespace MathTasks.Controllers {
             _userManager = userManager;
         }
 
+        [Authorize (Roles = "")]
         public IActionResult Index() {
             var users = _userManager.Users;
             return View(users);
