@@ -1,0 +1,32 @@
+﻿@model UserContentViewModel
+
+<h2>Content of user @Model.UserEmail.</h2>
+
+@{ var userHasTasks = Model.MathTasks.Any(); }
+
+<form asp-action="AcquireUserContent" method="get">
+    <input type="hidden" name="userId" value="@Model.UserId" />
+
+    @if (!userHasTasks) {
+        <div>
+            <p>
+                User has no task
+            </p>
+        </div>
+    }
+
+    @if (userHasTasks) {
+        <table class="table">
+            <tr>
+                <td>Id</td>
+                <td>Description</td>
+            </tr>
+            @foreach (var mathTask in Model.MathTasks) {
+                <tr>
+                    <td>@mathTask.Id</td>
+                    <td>@mathTask.Description</td>
+                </tr>
+            }
+        </table>
+    }
+</form>

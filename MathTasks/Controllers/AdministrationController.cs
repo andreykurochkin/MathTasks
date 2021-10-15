@@ -1,4 +1,5 @@
 ﻿using MathTasks.Data;
+using MathTasks.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -22,11 +23,16 @@ namespace MathTasks.Controllers {
         }
 
         [HttpGet]
-        public async Task<IActionResult> ViewUserContent(string userId) {
+        public async Task<IActionResult> AcquireUserContent(string userId) {
             var user = await _userManager.FindByIdAsync(userId);
             return (user is null)
                 ? NotFound()
-                : View(/*await CreateUserContentViewModel(user)*/);
+                : View(CreateUserContentViewModelWithMockMathTasks(user));
+        }
+
+        private UserContentViewModel CreateUserContentViewModelWithMockMathTasks(IdentityUser user) {
+            var viewModel = new UserContentViewModel() { UserId = user.Id, UserEmail = user.Email, MathTasks = new MockMathTasks() };
+            return viewModel;
         }
     }
 }
