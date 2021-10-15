@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace MathTasks.Controllers {
+    [Authorize(Roles ="Administrator")]
     public class AdministrationController : Controller {
         private readonly UserManager<IdentityUser> _userManager;
 
@@ -15,10 +16,17 @@ namespace MathTasks.Controllers {
             _userManager = userManager;
         }
 
-        [Authorize (Roles = "")]
         public IActionResult Index() {
             var users = _userManager.Users;
             return View(users);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewUserContent(string userId) {
+            var user = await _userManager.FindByIdAsync(userId);
+            return (user is null)
+                ? NotFound()
+                : View(/*await CreateUserContentViewModel(user)*/);
         }
     }
 }

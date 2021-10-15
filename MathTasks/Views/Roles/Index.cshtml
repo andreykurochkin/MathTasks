@@ -1,7 +1,9 @@
 ﻿@model IEnumerable<IdentityRole>
 
-<h2>Roles</h2>
 <table class="table">
+    <tr>
+        <th>Roles</th>
+    </tr>
     @foreach (var role in Model) {
         <tr>
             <td>@role.Name</td>

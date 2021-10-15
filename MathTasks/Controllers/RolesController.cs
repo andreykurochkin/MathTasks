@@ -66,13 +66,6 @@ namespace MathTasks.Controllers {
             return View(await CreateChangeRoleViewModel(user));
         }
 
-        private async Task<ChangeRoleViewModel> CreateChangeRoleViewModel(IdentityUser user) {
-            var userRoles = await _userManager.GetRolesAsync(user);
-            var allRoles = _roleManager.Roles;
-            var changeRoleViewModel = new ChangeRoleViewModel() { UserId = user.Id, UserRoles = userRoles, AllRoles = allRoles.ToList(), UserEmail = user.Email };
-            return changeRoleViewModel;
-        }
-
         [HttpPost]
         public async Task<IActionResult> Edit(string userId, IEnumerable<string> roles) {
             var user = await _userManager.FindByIdAsync(userId);
@@ -86,6 +79,14 @@ namespace MathTasks.Controllers {
             await _userManager.RemoveFromRolesAsync(user, removedRoles);
             return RedirectToAction("UserList");
         }
+
+        private async Task<ChangeRoleViewModel> CreateChangeRoleViewModel(IdentityUser user) {
+            var userRoles = await _userManager.GetRolesAsync(user);
+            var allRoles = _roleManager.Roles;
+            var changeRoleViewModel = new ChangeRoleViewModel() { UserId = user.Id, UserRoles = userRoles, AllRoles = allRoles.ToList(), UserEmail = user.Email };
+            return changeRoleViewModel;
+        }
+
 
         public IActionResult UserList() {
             var users = _userManager.Users;
