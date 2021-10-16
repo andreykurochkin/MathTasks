@@ -33,8 +33,10 @@ namespace MathTasks {
             services.AddIdentity<IdentityUser, IdentityRole>(options => { 
                 options.SignIn.RequireConfirmedAccount = true;
                 options.User.RequireUniqueEmail = true;
-            })
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            }).AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders()
+            .AddDefaultUI();
+
             services.AddControllersWithViews();
             services.AddRazorPages();
         }

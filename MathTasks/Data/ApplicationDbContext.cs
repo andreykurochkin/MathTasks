@@ -12,11 +12,5 @@ namespace MathTasks.Data {
             : base(options) {
         }
         public DbSet<MathTask> MathTasks { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder builder) {
-            base.OnModelCreating(builder);
-            builder.Entity<IdentityUser>()
-                .ToTable("AspNetUsers", t => t.ExcludeFromMigrations());
-        }
     }
 }
