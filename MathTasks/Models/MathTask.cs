@@ -8,7 +8,7 @@ namespace MathTasks.Models {
     public class MathTask {
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Theme { get; set; }
+        public string Content { get; set; }
         public int TopicId { get; set; }
         public Topic Topic { get; set; }
         public string Tags { get; set; }

@@ -135,7 +135,7 @@ namespace MathTasks.Controllers {
         public async Task<IActionResult> ShowSearchResults(string searchPhrase) {
             return View("Index", await _context.MathTasks
                 // todo change to full text search
-                .Where(mt => mt.Name.Contains(searchPhrase) || mt.Topic.Content.Contains(searchPhrase) || mt.Theme.Contains(searchPhrase))
+                .Where(mt => mt.Name.Contains(searchPhrase) || mt.Topic.Content.Contains(searchPhrase) || mt.Content.Contains(searchPhrase))
                 .ToListAsync());
         }
     }
