@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MathTasks.Data;
 using MathTasks.Models;
+using MathTasks.ViewModels;
 
 namespace MathTasks.Controllers {
     public class MathTasksController : Controller {
@@ -37,8 +38,21 @@ namespace MathTasks.Controllers {
         }
 
         // GET: MathTasks/Create
-        public IActionResult Create() {
+        public async Task<IActionResult> Create() {
+            ViewBag.Topic = CreateSelectListWithData(await GetTopics());
             return View();
+        }
+
+        private async Task<IEnumerable<Topic>> GetTopics() {
+            return await _context.Topics.ToListAsync();
+        }
+
+        private SelectList CreateSelectListWithData(IEnumerable<Topic> topics) {
+            var selectList = new SelectList(
+                items: topics, 
+                dataValueField: nameof(Topic.Id), 
+                dataTextField: nameof(Topic.Content));
+            return selectList;
         }
 
         // POST: MathTasks/Create
@@ -46,13 +60,22 @@ namespace MathTasks.Controllers {
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Theme,Subject")] MathTask mathTask) {
+        public async Task<IActionResult> Create([Bind("Id,Name,Content,TopicId")] MathTask mathTask) {
             if (ModelState.IsValid) {
+
+                var topic = await _context.Topics.FirstOrDefaultAsync();
+                mathTask.Topic = topic;
+
                 _context.Add(mathTask);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(mathTask);
+        }
+
+        private async Task<Topic> GetTopicById(int id) {
+            var topics = await GetTopics();
+            return topics.FirstOrDefault(t => t.Id.Equals(id));
         }
 
         // GET: MathTasks/Edit/5
