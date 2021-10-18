@@ -8,35 +8,28 @@ using Microsoft.EntityFrameworkCore;
 using MathTasks.Data;
 using MathTasks.Models;
 
-namespace MathTasks.Controllers
-{
-    public class MathTasksController : Controller
-    {
+namespace MathTasks.Controllers {
+    public class MathTasksController : Controller {
         private readonly ApplicationDbContext _context;
 
-        public MathTasksController(ApplicationDbContext context)
-        {
+        public MathTasksController(ApplicationDbContext context) {
             _context = context;
         }
 
         // GET: MathTasks
-        public async Task<IActionResult> Index()
-        {
+        public async Task<IActionResult> Index() {
             return View(await _context.MathTasks.ToListAsync());
         }
 
         // GET: MathTasks/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
+        public async Task<IActionResult> Details(int? id) {
+            if (id == null) {
                 return NotFound();
             }
 
             var mathTask = await _context.MathTasks
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (mathTask == null)
-            {
+            if (mathTask == null) {
                 return NotFound();
             }
 
@@ -44,8 +37,7 @@ namespace MathTasks.Controllers
         }
 
         // GET: MathTasks/Create
-        public IActionResult Create()
-        {
+        public IActionResult Create() {
             return View();
         }
 
@@ -54,10 +46,8 @@ namespace MathTasks.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Theme,Subject")] MathTask mathTask)
-        {
-            if (ModelState.IsValid)
-            {
+        public async Task<IActionResult> Create([Bind("Id,Name,Theme,Subject")] MathTask mathTask) {
+            if (ModelState.IsValid) {
                 _context.Add(mathTask);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -66,16 +56,13 @@ namespace MathTasks.Controllers
         }
 
         // GET: MathTasks/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
+        public async Task<IActionResult> Edit(int? id) {
+            if (id == null) {
                 return NotFound();
             }
 
             var mathTask = await _context.MathTasks.FindAsync(id);
-            if (mathTask == null)
-            {
+            if (mathTask == null) {
                 return NotFound();
             }
             return View(mathTask);
@@ -86,28 +73,20 @@ namespace MathTasks.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Theme,Subject")] MathTask mathTask)
-        {
-            if (id != mathTask.Id)
-            {
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Theme,Subject")] MathTask mathTask) {
+            if (id != mathTask.Id) {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
+            if (ModelState.IsValid) {
+                try {
                     _context.Update(mathTask);
                     await _context.SaveChangesAsync();
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!MathTaskExists(mathTask.Id))
-                    {
+                catch (DbUpdateConcurrencyException) {
+                    if (!MathTaskExists(mathTask.Id)) {
                         return NotFound();
-                    }
-                    else
-                    {
+                    } else {
                         throw;
                     }
                 }
@@ -117,17 +96,14 @@ namespace MathTasks.Controllers
         }
 
         // GET: MathTasks/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
+        public async Task<IActionResult> Delete(int? id) {
+            if (id == null) {
                 return NotFound();
             }
 
             var mathTask = await _context.MathTasks
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (mathTask == null)
-            {
+            if (mathTask == null) {
                 return NotFound();
             }
 
@@ -137,17 +113,30 @@ namespace MathTasks.Controllers
         // POST: MathTasks/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
+        public async Task<IActionResult> DeleteConfirmed(int id) {
             var mathTask = await _context.MathTasks.FindAsync(id);
             _context.MathTasks.Remove(mathTask);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool MathTaskExists(int id)
-        {
+        private bool MathTaskExists(int id) {
             return _context.MathTasks.Any(e => e.Id == id);
+        }
+
+        // GET: MathTasks/ShowSearchForm
+        [HttpGet]
+        public IActionResult ShowSearchForm() {
+            return View();
+        }
+
+        // POST: MathTasks/ShowSearchResults
+        [HttpPost]
+        public async Task<IActionResult> ShowSearchResults(string searchPhrase) {
+            return View("Index", await _context.MathTasks
+                // todo change to full text search
+                .Where(m => m.Name.Contains(searchPhrase) || m.Subject.Contains(searchPhrase) || m.Theme.Contains(searchPhrase))
+                .ToListAsync());
         }
     }
 }
