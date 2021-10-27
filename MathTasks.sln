@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31613.86
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MathTasks", "MathTasks\MathTasks.csproj", "{2B813B24-CE3C-4CD5-810E-62AB9E0BA631}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MathTasks", "MathTasks\MathTasks.csproj", "{2B813B24-CE3C-4CD5-810E-62AB9E0BA631}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MathTasks.DataAccessLibrary", "MathTasks.DataAccessLibrary\MathTasks.DataAccessLibrary.csproj", "{84EEA903-1A2A-4C8E-A2D4-A65FDC090658}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{2B813B24-CE3C-4CD5-810E-62AB9E0BA631}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B813B24-CE3C-4CD5-810E-62AB9E0BA631}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B813B24-CE3C-4CD5-810E-62AB9E0BA631}.Release|Any CPU.Build.0 = Release|Any CPU
+		{84EEA903-1A2A-4C8E-A2D4-A65FDC090658}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{84EEA903-1A2A-4C8E-A2D4-A65FDC090658}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{84EEA903-1A2A-4C8E-A2D4-A65FDC090658}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{84EEA903-1A2A-4C8E-A2D4-A65FDC090658}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
