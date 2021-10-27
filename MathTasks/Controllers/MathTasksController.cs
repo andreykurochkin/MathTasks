@@ -62,10 +62,6 @@ namespace MathTasks.Controllers {
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Content,TopicId")] MathTask mathTask) {
             if (ModelState.IsValid) {
-
-                var topic = await _context.Topics.FirstOrDefaultAsync();
-                mathTask.Topic = topic;
-
                 _context.Add(mathTask);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
