@@ -12,7 +12,6 @@ namespace MathTasks.Data {
             : base(options) {
         }
         public DbSet<MathTask> MathTasks { get; set; }
-
         public DbSet<Topic> Topics { get; set; }
     }
 }

@@ -12,6 +12,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Amazon.S3;
+using Amazon;
 
 namespace MathTasks {
     public class Startup {
@@ -36,6 +38,9 @@ namespace MathTasks {
             }).AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders()
             .AddDefaultUI();
+
+            services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
+            services.AddAWSService<IAmazonS3>();
 
             services.AddControllersWithViews();
             services.AddRazorPages();
