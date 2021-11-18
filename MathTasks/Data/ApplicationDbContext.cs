@@ -12,5 +12,11 @@ namespace MathTasks.Data {
             : base(options) {
         }
         public DbSet<MathTask> MathTasks { get; set; }
+        public DbSet<Tag> Tags { get; set; }
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.ApplyConfigurationsFromAssembly(typeof(Startup).Assembly);
+            base.OnModelCreating(builder);
+        }
     }
 }
