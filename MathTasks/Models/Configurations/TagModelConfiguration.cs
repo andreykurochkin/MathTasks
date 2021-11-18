@@ -9,6 +9,7 @@ namespace MathTasks.Models.Configurations
         {
             builder.ToTable("Tags");
             builder.HasKey(x => x.Id);
+            builder.Property(x => x.Id);
             builder.Property(x => x.Name)
                 .HasMaxLength(512)
                 .IsRequired();

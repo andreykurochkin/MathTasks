@@ -22,7 +22,7 @@ namespace MathTasks.Controllers {
         }
 
         // GET: MathTasks/Details/5
-        public async Task<IActionResult> Details(int? id) {
+        public async Task<IActionResult> Details(Guid? id) {
             if (id == null) {
                 return NotFound();
             }
@@ -73,7 +73,7 @@ namespace MathTasks.Controllers {
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Theme,Subject")] MathTask mathTask) {
+        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Name,Theme,Subject")] MathTask mathTask) {
             if (id != mathTask.Id) {
                 return NotFound();
             }
@@ -96,7 +96,7 @@ namespace MathTasks.Controllers {
         }
 
         // GET: MathTasks/Delete/5
-        public async Task<IActionResult> Delete(int? id) {
+        public async Task<IActionResult> Delete(Guid? id) {
             if (id == null) {
                 return NotFound();
             }
@@ -120,7 +120,7 @@ namespace MathTasks.Controllers {
             return RedirectToAction(nameof(Index));
         }
 
-        private bool MathTaskExists(int id) {
+        private bool MathTaskExists(Guid id) {
             return _context.MathTasks.Any(e => e.Id == id);
         }
 
@@ -135,7 +135,7 @@ namespace MathTasks.Controllers {
         public async Task<IActionResult> ShowSearchResults(string searchPhrase) {
             return View("Index", await _context.MathTasks
                 // todo change to full text search
-                .Where(m => m.Name.Contains(searchPhrase) || m.Content.Contains(searchPhrase) || m.Theme.Contains(searchPhrase))
+                .Where(m => m.Theme.Contains(searchPhrase) || m.Content.Contains(searchPhrase) || m.Theme.Contains(searchPhrase))
                 .ToListAsync());
         }
     }
