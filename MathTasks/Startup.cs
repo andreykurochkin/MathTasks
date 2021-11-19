@@ -1,4 +1,5 @@
 using MathTasks.Data;
+using MathTasks.Infrastructure.Mappers.Base;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -36,6 +37,9 @@ namespace MathTasks {
             }).AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders()
             .AddDefaultUI();
+
+            //MapperRegistration.GetMapperConfiguration();
+            services.AddAutoMapper(typeof(Startup).Assembly);
 
             services.AddControllersWithViews();
             services.AddRazorPages();
