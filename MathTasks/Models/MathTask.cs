@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MathTasks.Models {
-    public class MathTask {
+    public class MathTask : Auditable {
         public Guid Id { get; set; }
         public string Theme { get; set; }
         public string Content { get; set; }

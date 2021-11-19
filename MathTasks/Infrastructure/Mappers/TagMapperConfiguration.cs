@@ -10,7 +10,8 @@ namespace MathTasks.Infrastructure.Mappers
         {
             CreateMap<Tag, TagViewModel>();
             CreateMap<Tag, UpdateTagViewModel>();
-            CreateMap<UpdateTagViewModel,Tag>();
+            CreateMap<UpdateTagViewModel,Tag>()
+                .ForMember(tag => tag.MathTasks, option=>option.Ignore());
         }
     }
 }

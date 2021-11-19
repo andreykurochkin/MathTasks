@@ -12,7 +12,12 @@ namespace MathTasks.Tests
             internal MapperConfiguration GetMapperConfiguration() => MapperRegistration.GetMapperConfiguration();
         }
 
-        private readonly MapperRegistrationDongle _sut = new MapperRegistrationDongle();
+        private readonly MapperRegistrationDongle _sut;
+
+        public AutomapperTests()
+        {
+            _sut = new MapperRegistrationDongle();
+        }
 
         [Fact]
         [Trait("Automapper", "Mapper configuration")]
