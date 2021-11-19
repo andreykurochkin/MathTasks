@@ -22,7 +22,7 @@ namespace MathTasks.Infrastructure.Mappers.Base
             return typeof(Startup).GetTypeInfo()
                 .Assembly
                 .GetTypes()
-                .Where(t => typeof(IAutomapper).IsAssignableTo(t))
+                .Where(t => typeof(IAutomapper).IsAssignableFrom(t))
                 .Where(t => !t.GetTypeInfo().IsAbstract);
         }
     }
