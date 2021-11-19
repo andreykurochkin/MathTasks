@@ -7,7 +7,7 @@ namespace MathTasks.Models.Configurations
     {
         public void Configure(EntityTypeBuilder<MathTask> builder)
         {
-            builder.ToTable("Facts");
+            builder.ToTable("MathTasks");
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id);
             builder.Property(x => x.Theme)
