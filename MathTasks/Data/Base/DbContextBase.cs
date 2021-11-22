@@ -3,7 +3,10 @@ using MathTasks.Providers;
 using MathTasks.Providers.Base;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -46,22 +49,24 @@ namespace MathTasks.Data
         private void DbSaveChanges()
         {
             IEmailProvider defaultEmailProvider = new DefaultEmailProvider();
-            IDateTimeProvider utcNowDateTimeProvider = new UtcNowDateTimeProvider(); 
-            ProcessAddedEntries(defaultDate, defaultEmailProvider);
-            ProcessModifiedEntries(defaultEmailProvider);
+            IDateTimeProvider utcNowDateTimeProvider = new UtcNowDateTimeProvider();
+            ProcessAddedEntries(GetAddedAuditableEntries(), utcNowDateTimeProvider, defaultEmailProvider);
+            ProcessModifiedEntries(GetModifiedAuditableEntries(), defaultEmailProvider, utcNowDateTimeProvider);
         }
 
-        private void ProcessAddedEntries(IDateTimeProvider dateTimeProvider, IEmailProvider emailProvider)
+        private IEnumerable<EntityEntry> GetAddedAuditableEntries()
         {
-            var addedEntities = ChangeTracker.Entries()
-                            .Where(entry => entry.State == EntityState.Added);
+            var result = ChangeTracker.Entries()
+                .Where(entry => entry.State == EntityState.Added)
+                .Where(entry => entry is IAuditable);
+            return result;
+        }
 
-            foreach (var entry in addedEntities)
+        private void ProcessAddedEntries(IEnumerable<EntityEntry> inputEntries, IDateTimeProvider dateTimeProvider, IEmailProvider emailProvider)
+        {
+            var entries = inputEntries.ToList();
+            entries.ForEach(entry =>
             {
-                if (entry is not IAuditable)
-                {
-                    continue;
-                }
                 var createdBy = entry.Property(nameof(IAuditable.CreatedBy));
                 var updatedBy = entry.Property(nameof(IAuditable.UpdatedBy));
                 var createdAt = entry.Property(nameof(IAuditable.CreatedAt));
@@ -86,22 +91,26 @@ namespace MathTasks.Data
                 {
                     entry.Property(nameof(IAuditable.UpdatedAt)).CurrentValue = dateTimeProvider.ToDateTime();
                 }
-            }
+            });
         }
 
-        private void ProcessModifiedEntries(IEmailProvider  emailProvider)
+        private IEnumerable<EntityEntry> GetModifiedAuditableEntries()
         {
-            var modifiedEntities = ChangeTracker.Entries()
-                            .Where(entry => entry.State == EntityState.Modified);
-            foreach (var entry in modifiedEntities)
-            {
-                if (entry is IAuditable)
+            var result = ChangeTracker.Entries()
+                .Where(entry => entry.State == EntityState.Modified)
+                .Where(entry => entry is IAuditable);
+            return result;
+        }
+
+        private void ProcessModifiedEntries(IEnumerable<EntityEntry> inputEntries, IEmailProvider emailProvider, IDateTimeProvider dateTimeProvider)
+        {
+            var entries = inputEntries.ToList();
+            entries.ForEach(entry =>
                 {
                     var userName = entry.Property(nameof(IAuditable.UpdatedBy)).CurrentValue ?? emailProvider.ToString();
-                    entry.Property(nameof(IAuditable.UpdatedAt)).CurrentValue = DateTime.UtcNow;
+                    entry.Property(nameof(IAuditable.UpdatedAt)).CurrentValue = dateTimeProvider.ToDateTime();
                     entry.Property(nameof(IAuditable.UpdatedBy)).CurrentValue = emailProvider.ToString();
-                }
-            }
+                });
         }
     }
 }
