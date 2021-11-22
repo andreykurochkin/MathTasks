@@ -14,7 +14,7 @@ namespace MathTasks.Infrastructure.Mappers
                 .ForMember(mathTask => mathTask.Tags, option => option.Ignore())
                 .ForMember(mathTask => mathTask.CreatedAt, option => option.Ignore())
                 .ForMember(mathTask => mathTask.CreatedBy, option => option.Ignore())
-                .ForMember(mathTask => mathTask.UpdateddBy, option => option.Ignore())
+                .ForMember(mathTask => mathTask.UpdatedBy, option => option.Ignore())
                 .ForMember(mathTask => mathTask.UpdatedAt, option => option.Ignore());
             CreateMap<MathTask, MathTaskUpdateViewModel>();
             CreateMap<MathTaskUpdateViewModel, MathTask>()
@@ -22,7 +22,7 @@ namespace MathTasks.Infrastructure.Mappers
                 .ForMember(mathTask => mathTask.Tags, option => option.Ignore())
                 .ForMember(mathTask => mathTask.CreatedAt, option => option.Ignore())
                 .ForMember(mathTask => mathTask.CreatedBy, option => option.Ignore())
-                .ForMember(mathTask => mathTask.UpdateddBy, option => option.Ignore())
+                .ForMember(mathTask => mathTask.UpdatedBy, option => option.Ignore())
                 .ForMember(mathTask => mathTask.UpdatedAt, option => option.Ignore());
         }
     }
