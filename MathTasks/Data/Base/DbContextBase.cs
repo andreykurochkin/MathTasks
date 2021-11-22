@@ -108,7 +108,7 @@ namespace MathTasks.Data
         {
             var userName = entry.Property(nameof(IAuditable.UpdatedBy)).CurrentValue ?? providers.Item1.ToString();
             entry.Property(nameof(IAuditable.UpdatedAt)).CurrentValue = providers.Item2.ToDateTime();
-            entry.Property(nameof(IAuditable.UpdatedBy)).CurrentValue = providers.Item1.ToString();
+            entry.Property(nameof(IAuditable.UpdatedBy)).CurrentValue = userName;
         }
     }
 }

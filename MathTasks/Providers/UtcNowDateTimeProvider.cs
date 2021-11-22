@@ -5,7 +5,7 @@ namespace MathTasks.Providers
 {
     public class UtcNowDateTimeProvider : IDateTimeProvider
     {
-        private DateTime _value => DateTime.UtcNow;
-        public DateTime ToDateTime() => _value;
+        private readonly DateTime value = DateTime.UtcNow;
+        public DateTime ToDateTime() => value;
     }
 }
