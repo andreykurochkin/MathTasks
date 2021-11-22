@@ -48,13 +48,14 @@ namespace MathTasks.Data
 
         private void DbSaveChanges()
         {
-            IEmailProvider defaultEmailProvider = new DefaultEmailProvider();
-            IDateTimeProvider utcNowDateTimeProvider = new UtcNowDateTimeProvider();
-            ProcessAddedEntries(GetAddedAuditableEntries(), utcNowDateTimeProvider, defaultEmailProvider);
-            ProcessModifiedEntries(GetModifiedAuditableEntries(), defaultEmailProvider, utcNowDateTimeProvider);
+            var providers = new Tuple<IEmailProvider, IDateTimeProvider>(new DefaultEmailProvider(), new UtcNowDateTimeProvider());
+            GetAddedAuditableItems().ToList()
+                .ForEach(entry => UpdateAddedItem(entry, providers));
+            GetModifiedAuditableItems().ToList()
+                .ForEach(entry => UpdateModifiedItem(entry, providers));
         }
 
-        private IEnumerable<EntityEntry> GetAddedAuditableEntries()
+        private IEnumerable<EntityEntry> GetAddedAuditableItems()
         {
             var result = ChangeTracker.Entries()
                 .Where(entry => entry.State == EntityState.Added)
@@ -62,39 +63,40 @@ namespace MathTasks.Data
             return result;
         }
 
-        private void ProcessAddedEntries(IEnumerable<EntityEntry> inputEntries, IDateTimeProvider dateTimeProvider, IEmailProvider emailProvider)
+        private static void UpdateAddedItem(EntityEntry entry, Tuple<IEmailProvider, IDateTimeProvider> providers)
         {
-            var entries = inputEntries.ToList();
-            entries.ForEach(entry =>
+            var createdBy = entry.Property(nameof(IAuditable.CreatedBy));
+            var updatedBy = entry.Property(nameof(IAuditable.UpdatedBy));
+            var createdAt = entry.Property(nameof(IAuditable.CreatedAt));
+            var updatedAt = entry.Property(nameof(IAuditable.UpdatedAt));
+
+            if (string.IsNullOrEmpty(createdBy?.ToString()))
             {
-                var createdBy = entry.Property(nameof(IAuditable.CreatedBy));
-                var updatedBy = entry.Property(nameof(IAuditable.UpdatedBy));
-                var createdAt = entry.Property(nameof(IAuditable.CreatedAt));
-                var updatedAt = entry.Property(nameof(IAuditable.UpdatedAt));
+                entry.Property(nameof(IAuditable.CreatedBy)).CurrentValue = providers.Item1.ToString();
+            }
 
-                if (string.IsNullOrEmpty(createdBy?.ToString()))
-                {
-                    entry.Property(nameof(IAuditable.CreatedBy)).CurrentValue = emailProvider.ToString();
-                }
+            if (string.IsNullOrEmpty(updatedBy?.ToString()))
+            {
+                entry.Property(nameof(IAuditable.UpdatedBy)).CurrentValue = providers.Item1.ToString();
+            }
 
-                if (string.IsNullOrEmpty(updatedBy?.ToString()))
-                {
-                    entry.Property(nameof(IAuditable.UpdatedBy)).CurrentValue = emailProvider.ToString();
-                }
+            if (DateTime.Parse(createdAt?.ToString()!).Year < 1970)
+            {
+                entry.Property(nameof(IAuditable.CreatedAt)).CurrentValue = providers.Item2.ToDateTime();
+            }
 
-                if (DateTime.Parse(createdAt?.ToString()!).Year < 1970)
-                {
-                    entry.Property(nameof(IAuditable.CreatedAt)).CurrentValue = dateTimeProvider.ToDateTime();
-                }
+            if ((updatedAt is not null) && DateTime.Parse(updatedAt?.ToString()).Year < 1970)
+            {
+                entry.Property(nameof(IAuditable.UpdatedAt)).CurrentValue = providers.Item2.ToDateTime();
+            }
+            else
+            {
+                entry.Property(nameof(IAuditable.UpdatedAt)).CurrentValue = providers.Item2.ToDateTime();
 
-                if ((updatedAt is not null) && DateTime.Parse(updatedAt?.ToString()).Year < 1970)
-                {
-                    entry.Property(nameof(IAuditable.UpdatedAt)).CurrentValue = dateTimeProvider.ToDateTime();
-                }
-            });
+            }
         }
 
-        private IEnumerable<EntityEntry> GetModifiedAuditableEntries()
+        private IEnumerable<EntityEntry> GetModifiedAuditableItems()
         {
             var result = ChangeTracker.Entries()
                 .Where(entry => entry.State == EntityState.Modified)
@@ -102,15 +104,11 @@ namespace MathTasks.Data
             return result;
         }
 
-        private void ProcessModifiedEntries(IEnumerable<EntityEntry> inputEntries, IEmailProvider emailProvider, IDateTimeProvider dateTimeProvider)
+        private static void UpdateModifiedItem(EntityEntry entry, Tuple<IEmailProvider, IDateTimeProvider> providers)
         {
-            var entries = inputEntries.ToList();
-            entries.ForEach(entry =>
-                {
-                    var userName = entry.Property(nameof(IAuditable.UpdatedBy)).CurrentValue ?? emailProvider.ToString();
-                    entry.Property(nameof(IAuditable.UpdatedAt)).CurrentValue = dateTimeProvider.ToDateTime();
-                    entry.Property(nameof(IAuditable.UpdatedBy)).CurrentValue = emailProvider.ToString();
-                });
+            var userName = entry.Property(nameof(IAuditable.UpdatedBy)).CurrentValue ?? providers.Item1.ToString();
+            entry.Property(nameof(IAuditable.UpdatedAt)).CurrentValue = providers.Item2.ToDateTime();
+            entry.Property(nameof(IAuditable.UpdatedBy)).CurrentValue = providers.Item1.ToString();
         }
     }
 }
