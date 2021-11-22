@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MediatR;
 
 namespace MathTasks {
     public class Startup {
@@ -40,6 +41,8 @@ namespace MathTasks {
 
             //MapperRegistration.GetMapperConfiguration();
             services.AddAutoMapper(typeof(Startup).Assembly);
+
+            services.AddMediatR(typeof(Startup));
 
             services.AddControllersWithViews();
             services.AddRazorPages();
