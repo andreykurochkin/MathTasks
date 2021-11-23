@@ -49,17 +49,19 @@ namespace MathTasks.Data
         private void DbSaveChanges()
         {
             var providers = new Tuple<IEmailProvider, IDateTimeProvider>(new DefaultEmailProvider(), new UtcNowDateTimeProvider());
-            GetAddedAuditableItems().ToList()
-                .ForEach(entry => UpdateAddedItem(entry, providers));
-            GetModifiedAuditableItems().ToList()
-                .ForEach(entry => UpdateModifiedItem(entry, providers));
+            
+            var addedItems = GetAddedAuditableItems().ToList();
+            addedItems.ForEach(entry => UpdateAddedItem(entry, providers));
+
+            var modifiedItems = GetModifiedAuditableItems().ToList();
+            modifiedItems.ForEach(entry => UpdateModifiedItem(entry, providers));
         }
 
         private IEnumerable<EntityEntry> GetAddedAuditableItems()
         {
             var result = ChangeTracker.Entries()
                 .Where(entry => entry.State == EntityState.Added)
-                .Where(entry => entry is IAuditable);
+                .Where(entry => entry.Entity is IAuditable);
             return result;
         }
 
@@ -70,22 +72,27 @@ namespace MathTasks.Data
             var createdAt = entry.Property(nameof(IAuditable.CreatedAt));
             var updatedAt = entry.Property(nameof(IAuditable.UpdatedAt));
 
-            if (string.IsNullOrEmpty(createdBy?.ToString()))
+            if (string.IsNullOrEmpty(createdBy?.CurrentValue?.ToString()))
             {
                 entry.Property(nameof(IAuditable.CreatedBy)).CurrentValue = providers.Item1.ToString();
             }
 
-            if (string.IsNullOrEmpty(updatedBy?.ToString()))
+            if (string.IsNullOrEmpty(updatedBy?.CurrentValue?.ToString()))
             {
                 entry.Property(nameof(IAuditable.UpdatedBy)).CurrentValue = providers.Item1.ToString();
             }
 
-            if (DateTime.Parse(createdAt?.ToString()!).Year < 1970)
+            if (DateTime.Parse(createdAt?.CurrentValue?.ToString()!).Year < 1970)
             {
                 entry.Property(nameof(IAuditable.CreatedAt)).CurrentValue = providers.Item2.ToDateTime();
             }
 
-            if ((updatedAt is not null) && DateTime.Parse(updatedAt?.ToString()).Year < 1970)
+            // wtf refactor me to validator
+            if (
+                (updatedAt is not null)
+                && (updatedAt.CurrentValue is not null) 
+                && (DateTime.Parse(updatedAt.CurrentValue.ToString()).Year < 1970)
+                )
             {
                 entry.Property(nameof(IAuditable.UpdatedAt)).CurrentValue = providers.Item2.ToDateTime();
             }
@@ -100,7 +107,7 @@ namespace MathTasks.Data
         {
             var result = ChangeTracker.Entries()
                 .Where(entry => entry.State == EntityState.Modified)
-                .Where(entry => entry is IAuditable);
+                .Where(entry => entry.Entity is IAuditable);
             return result;
         }
 

@@ -23,6 +23,7 @@ namespace MathTasks.Mediatr.Base
         private string CreateNotificationMessage(NotificationBase notification)
         {
             var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine(notification.Content);
             stringBuilder.AppendLine(notification.Exception?.Message);
             stringBuilder.AppendLine(notification.Exception?.InnerException?.Message);
             stringBuilder.AppendLine(notification.Exception?.GetBaseException().Message);
@@ -33,7 +34,12 @@ namespace MathTasks.Mediatr.Base
         {
             try
             {
-                var entity = new Notification(notification.Subject, CreateNotificationMessage(notification), notification.AddressFrom, notification.AddressTo);
+                var entity = new Notification(
+                    subject: notification.Subject, 
+                    content: CreateNotificationMessage(notification), 
+                    addressFrom: notification.AddressFrom, 
+                    addressTo: notification.AddressTo
+                );
                 await _context.Notifications.AddAsync(entity, cancellationToken);
                 await _context.SaveChangesAsync();
                 _logger.NotificationAdded(notification.Subject);

@@ -1,4 +1,6 @@
-﻿using MathTasks.Models;
+﻿using MathTasks.Mediatr;
+using MathTasks.Models;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -10,16 +12,21 @@ using System.Threading.Tasks;
 namespace MathTasks.Controllers {
     public class HomeController : Controller {
         private readonly ILogger<HomeController> _logger;
+        private readonly IMediator _mediator;
 
-        public HomeController(ILogger<HomeController> logger) {
+        public HomeController(ILogger<HomeController> logger, IMediator mediator)
+        {
             _logger = logger;
+            _mediator = mediator;
         }
 
         public IActionResult Index() {
             return View();
         }
 
-        public IActionResult Privacy() {
+        public async Task<IActionResult> Privacy() {
+            await _mediator.Publish(new ErrorNotification(content: "Privacy notification test"), HttpContext.RequestAborted);
+            await _mediator.Publish(new FeedBackNotification(content: "Privacy notification test"), HttpContext.RequestAborted);
             return View();
         }
 

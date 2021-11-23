@@ -9,7 +9,7 @@ namespace MathTasks.Mediatr
 {
     public class ErrorNotification : NotificationBase
     {
-        public ErrorNotification(string subject, string content, string addressFrom, string addressTo, Exception? exception = null) 
+        public ErrorNotification(string content, Exception? exception = null) 
             : base(
                   subject: "Error", 
                   content, 

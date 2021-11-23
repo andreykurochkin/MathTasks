@@ -7,13 +7,17 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MathTasks.Data;
 using MathTasks.Models;
+using MediatR;
 
 namespace MathTasks.Controllers {
     public class MathTasksController : Controller {
         private readonly ApplicationDbContext _context;
+        private readonly IMediator _mediator;
 
-        public MathTasksController(ApplicationDbContext context) {
+        public MathTasksController(ApplicationDbContext context, IMediator mediator)
+        {
             _context = context;
+            _mediator = mediator;
         }
 
         // GET: MathTasks

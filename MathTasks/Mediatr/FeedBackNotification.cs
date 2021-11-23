@@ -8,7 +8,7 @@ namespace MathTasks.Mediatr
 {
     public class FeedBackNotification : NotificationBase
     {
-        public FeedBackNotification(string subject, string content, string addressFrom, string addressTo, Exception? exception = null)
+        public FeedBackNotification(string content, Exception? exception = null)
             : base(
                   subject: "Feedback",
                   content,
