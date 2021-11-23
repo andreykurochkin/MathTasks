@@ -28,7 +28,7 @@ namespace MathTasks.Extensions
 
         private static readonly Action<ILogger, string, Exception?> DatabaseSavingErrorExecute = 
             LoggerMessage.Define<string>(
-                LogLevel.Information,
+                LogLevel.Error,
                 EventIdentifiers.DatabaseSavingErrorId, 
                 "{entityName}");
     }

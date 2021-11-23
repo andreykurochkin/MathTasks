@@ -15,14 +15,9 @@ namespace MathTasks.Models.Configurations
             builder.Property(x => x.UpdatedAt);
             builder.Property(x => x.UpdatedBy).IsRequired();
 
-            builder.Property(x => x.Theme)
-                .HasMaxLength(100)
-                .IsRequired();
-            builder.Property(x => x.Content)
-                .HasMaxLength(3000)
-                .IsRequired();
-            builder.HasMany(x => x.Tags)
-                .WithMany(x => x.MathTasks);
+            builder.Property(x => x.Theme).HasMaxLength(100).IsRequired();
+            builder.Property(x => x.Content).HasMaxLength(3000).IsRequired();
+            builder.HasMany(x => x.Tags).WithMany(x => x.MathTasks);
         }
     }
 }
