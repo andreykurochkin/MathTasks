@@ -1,8 +1,11 @@
 ﻿using MathTasks.Data;
+using MathTasks.Extensions;
 using MathTasks.Models;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,17 +20,27 @@ namespace MathTasks.Mediatr.Base
             _logger = logger;
             _context = context;
         }
+        private string CreateNotificationMessage(NotificationBase notification)
+        {
+            var stringBuilder = new StringBuilder();
+            stringBuilder.AppendLine(notification.Exception?.Message);
+            stringBuilder.AppendLine(notification.Exception?.InnerException?.Message);
+            stringBuilder.AppendLine(notification.Exception?.GetBaseException().Message);
+            stringBuilder.AppendLine(notification.Exception?.StackTrace);
+            return stringBuilder.ToString();
+        }
         public async Task Handle(T notification, CancellationToken cancellationToken)
         {
             try
             {
-                var entity = new Notification(notification.Subject, notification.Content, notification.AddressFrom, notification.AddressTo);
+                var entity = new Notification(notification.Subject, CreateNotificationMessage(notification), notification.AddressFrom, notification.AddressTo);
                 await _context.Notifications.AddAsync(entity, cancellationToken);
                 await _context.SaveChangesAsync();
+                _logger.NotificationAdded(notification.Subject);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                _logger.DatabaseSavingError();
+                _logger.DatabaseSavingError(nameof(Notification), ex);
             }
         }
     }
