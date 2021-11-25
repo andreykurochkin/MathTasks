@@ -11,6 +11,7 @@ using System.Text.Json;
 using Xunit.Sdk;
 using Xunit.Abstractions;
 using Tynamix.ObjectFiller;
+using MathTasks.Extensions;
 
 namespace MathTasks.Tests
 {
@@ -39,7 +40,7 @@ namespace MathTasks.Tests
                 .OnProperty(x => x.CreatedBy).Use(new EmailAddresses(_topLevelDomain));
 
             var mathTask = mathTaskFiller.Create();
-            
+
             var tagFiller = new Filler<Tag>();
             tagFiller.Setup()
                 .OnProperty(x => x.MathTasks).IgnoreIt()
@@ -54,6 +55,42 @@ namespace MathTasks.Tests
             var tagToJson = JsonSerializer.Serialize(tag, _serializerOptions);
             tagToJson.Should().NotBeNull();
             _testOutputHelper.WriteLine(tagToJson);
+        }
+
+        [Fact]
+        public void Randomizer_ShouldReturnRandomSubsetOfItems_WhenDataIsValid()
+        {
+            //var localTags = Enumerable.Range(0, 10).Select(i=>CreateTag()).ToList();
+
+            //var collectionizer = new Collectionizer<Tag, TagsRandomizer>(new TagsRandomizer { Tags = localTags }, (uint)1, (uint)localTags.Count);
+
+            //_testOutputHelper.WriteLine(string.Join(",", localTags.Select(tag=>tag.Name)));
+            //_testOutputHelper.WriteLine(string.Join(",", collectionizer.GetValue().Select(tag => tag.Name).ToList()));
+
+
+            int elementsCount = 10;
+            var list = Enumerable.Range(0, elementsCount).ToList();
+            _testOutputHelper.WriteLine(string.Join(",", list.Select(i => i.ToString())));
+            _testOutputHelper.WriteLine("\n");
+            for (int i = 0; i < elementsCount; i++)
+            {
+                var result = GetRandomElements<int>(list, Random.Shared.Next(0, elementsCount-1));
+                _testOutputHelper.WriteLine(string.Join(",", result.Select(i => i.ToString())));
+            }
+        }
+
+        public List<T> GetRandomElements<T>(IEnumerable<T> list, int elementsCount)
+        {
+            return list.OrderBy(arg => Guid.NewGuid()).Take(elementsCount).ToList();
+        }
+
+        private Tag CreateTag()
+        {
+            var tagFiller = new Filler<Tag>();
+            tagFiller.Setup()
+                .OnProperty(x => x.MathTasks).IgnoreIt()
+                .OnProperty(x => x.Name).Use(new MnemonicString(1));
+            return tagFiller.Create();
         }
     }
 }
