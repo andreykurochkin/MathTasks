@@ -20,11 +20,6 @@ namespace MathTasks.Data
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Notification> Notifications { get; set; }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            base.OnConfiguring(optionsBuilder);
-        }
-
         private MathTask CreateMathTask()
         {
             var mathTaskFiller = new Filler<MathTask>();

@@ -1,7 +1,6 @@
 ﻿using MathTasks.Data;
 using MathTasks.Models;
 using MathTasks.Seed;
-//using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
@@ -41,12 +40,11 @@ namespace MathTasks.Extensions
         public void Seed()
         {
             InitializeNavigationProperties();
+            _context.Tags.AddRange(_tags);
+            _context.MathTasks.AddRange(_mathTasks);
             _context?.SaveChanges();
         }
-        private void InitializeNavigationProperties()
-        {
-
-        }
+        private void InitializeNavigationProperties() => _mathTasks.ForEach(t => t.Tags = _tags.ToRandomList());
 
         private List<T> CreateEntities<T>(int count, Func<T> func) => Enumerable.Range(1, count)
                     .Select(i => func())
