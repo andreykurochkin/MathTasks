@@ -68,6 +68,9 @@ namespace MathTasks {
 
             app.UseEndpoints(endpoints => {
                 endpoints.MapControllerRoute(
+                    name: "alter",
+                    pattern: "{controller=AlterMathTasks}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapRazorPages();
