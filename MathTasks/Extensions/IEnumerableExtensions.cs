@@ -13,10 +13,10 @@ namespace MathTasks.Extensions
         /// <param name="source"></param>
         /// <param name="elementsCount"></param>
         /// <returns></returns>
-        public static List<T> ToRandomList<T>(this IEnumerable<T> source, int elementsCount = 0)
+        public static List<T> ToRandomList<T>(this IEnumerable<T> source)
         {
             return source.OrderBy(arg => Guid.NewGuid())
-                .Take(Random.Shared.Next(0, source.Count() - 1))
+                .Take(Random.Shared.Next(1, source.Count()))
                 .ToList();
         }
     }
