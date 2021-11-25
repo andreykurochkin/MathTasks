@@ -36,9 +36,24 @@ namespace MathTasks.Extensions
             _tags = CreateEntities<Tag>(TagsCount, EntityFactory.CreateTag);
             _mathTasks = CreateEntities<MathTask>(MathTasksCount, EntityFactory.CreateMathTask);
         }
-
+        private bool IsSeeded()
+        {
+            if (_context.Tags.Count() != 0)
+            {
+                return true;
+            }
+            if (_context.MathTasks.Count() != 0)
+            {
+                return true;
+            }
+            return false;
+        }
         public void Seed()
         {
+            if (IsSeeded())
+            {
+                return;
+            }
             InitializeNavigationProperties();
             _context.Tags.AddRange(_tags);
             _context.MathTasks.AddRange(_mathTasks);
