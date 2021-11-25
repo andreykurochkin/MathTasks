@@ -35,7 +35,7 @@ namespace MathTasks.Extensions
         {
             _context = applicationDbContext;
             _mathTasks = CreateEntities<MathTask>(MathTasksCount, CreateMathTask);
-            _tags = CreateTags(TagsCount);
+            _tags = CreateEntities<Tag>(TagsCount, CreateTag);
         }
 
         public void Seed()
