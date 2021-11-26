@@ -9,6 +9,8 @@ namespace MathTasks.Infrastructure.Mappers
         public MathTaskMapperConfiguration()
         {
             CreateMap<MathTask, MathTaskViewModel>();
+            CreateMap<MathTaskViewModel, MathTask>();
+
             CreateMap<MathTaskCreateViewModel, MathTask>()
                 .ForMember(mathTask => mathTask.Id, option => option.Ignore())
                 .ForMember(mathTask => mathTask.Tags, option => option.Ignore())
@@ -16,7 +18,9 @@ namespace MathTasks.Infrastructure.Mappers
                 .ForMember(mathTask => mathTask.CreatedBy, option => option.Ignore())
                 .ForMember(mathTask => mathTask.UpdatedBy, option => option.Ignore())
                 .ForMember(mathTask => mathTask.UpdatedAt, option => option.Ignore());
+
             CreateMap<MathTask, MathTaskUpdateViewModel>();
+
             CreateMap<MathTaskUpdateViewModel, MathTask>()
                 .ForMember(mathTask => mathTask.Id, option => option.Ignore())
                 .ForMember(mathTask => mathTask.Tags, option => option.Ignore())

@@ -23,11 +23,11 @@ namespace MathTasks.Controllers.AlterMathTasks.Handlers
             _mapper = mapper;
             _context = context;
         }
-        public Task<IEnumerable<MathTaskViewModel>> Handle(GetMathTaskViewModelsQuery request, CancellationToken cancellationToken)
+        public async Task<IEnumerable<MathTaskViewModel>> Handle(GetMathTaskViewModelsQuery request, CancellationToken cancellationToken)
         {
-            var dbItems = _context.MathTasks.ToListAsync();
+            var dbItems = await _context.MathTasks.ToListAsync();
             var mappedItems = _mapper.Map<IEnumerable<MathTaskViewModel>>(dbItems);
-            return Task.FromResult(mappedItems);
+            return mappedItems;
         }
     }
 }

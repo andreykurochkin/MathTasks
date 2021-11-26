@@ -19,16 +19,5 @@ namespace MathTasks.Data
         public DbSet<MathTask> MathTasks { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Notification> Notifications { get; set; }
-
-        private MathTask CreateMathTask()
-        {
-            var mathTaskFiller = new Filler<MathTask>();
-            mathTaskFiller.Setup()
-                .OnProperty(x => x.Tags).IgnoreIt()
-                .OnProperty(x => x.Theme).Use(new MnemonicString(5))
-                .OnProperty(x => x.CreatedBy).Use(new EmailAddresses(_topLevelDomain))
-                .OnProperty(x => x.CreatedBy).Use(new EmailAddresses(_topLevelDomain));
-            return mathTaskFiller.Create();
-        }
     }
 }

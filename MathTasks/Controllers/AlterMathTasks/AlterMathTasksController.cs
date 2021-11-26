@@ -26,11 +26,10 @@ namespace MathTasks.Controllers.AlterMathTasks
             _mediator = mediator;
         }
 
-        public string Index()
+        public async Task<IActionResult> Index()
         {
-            return "Hello World";
-            //var models = await _mediator.Send(new GetMathTaskViewModelsQuery());
-            //return View(models);
+            var models = await _mediator.Send(new GetMathTaskViewModelsQuery());
+            return View(models);
         }
     }
 }
