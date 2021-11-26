@@ -32,5 +32,10 @@ namespace MathTasks.Controllers.AlterMathTasks
             var models = await _mediator.Send(new GetMathTaskViewModelsQuery());
             return View(models);
         }
+
+        public IActionResult Show(Guid id)
+        {
+            return View();
+        }
     }
 }
