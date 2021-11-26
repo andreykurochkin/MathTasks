@@ -8,7 +8,8 @@ namespace MathTasks.ViewModels
     {
         public Guid Id { get; set; }
         public string Theme { get; set; }
-        public string Content { get; set; }
-        public IEnumerable<TagViewModel> Tags { get; set; }
+        public string Content { get; set; } = null;
+        public DateTime CreatedAt { get;set; }
+        public IEnumerable<TagViewModel> Tags { get; set; } = null;
     }
 }
