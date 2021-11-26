@@ -25,7 +25,7 @@ namespace MathTasks.Controllers.AlterMathTasks.Handlers
         }
         public async Task<IEnumerable<MathTaskViewModel>> Handle(GetMathTaskViewModelsQuery request, CancellationToken cancellationToken)
         {
-            var dbItems = await _context.MathTasks.ToListAsync();
+            var dbItems = await _context.MathTasks.Include(mathTask => mathTask.Tags).ToListAsync();
             var mappedItems = _mapper.Map<IEnumerable<MathTaskViewModel>>(dbItems);
             return mappedItems;
         }
