@@ -1,4 +1,5 @@
-﻿@model MathTaskViewModel
+﻿@using MathTasks.ViewModels
+@model MathTaskViewModel
 @if (Model is null)
 {
     <h1>Error while processing request ...</h1>
@@ -6,11 +7,5 @@
 }
 else
 {
-    <p>@Model.CreatedAt</p>
-    
-    <p class="lead">
-        @Model.Content
-    </p>
-
-    <div><partial name="_Tags" /></div>
+    <partial name="_MathTask" model="Model"></partial>
 }
