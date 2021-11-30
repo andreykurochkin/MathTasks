@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using MathTasks.Controllers.AlterMathTasks.Queries;
 using MathTasks.Data;
-using MathTasks.Models;
 using MathTasks.ViewModels;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

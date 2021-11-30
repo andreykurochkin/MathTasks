@@ -1,5 +1,4 @@
-﻿using MathTasks.Models;
-using MathTasks.ViewModels;
+﻿using MathTasks.ViewModels;
 using MediatR;
 using System.Collections.Generic;
 

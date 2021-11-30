@@ -1,1 +1,16 @@
-﻿<h1>Show</h1>
+﻿@model MathTaskViewModel
+@if (Model is null)
+{
+    <h1>Error while processing request ...</h1>
+    <p class="alert alert-warning">No model found</p>
+}
+else
+{
+    <p>@Model.CreatedAt</p>
+    
+    <p class="lead">
+        @Model.Content
+    </p>
+
+    <div><partial name="_Tags" /></div>
+}

@@ -22,20 +22,12 @@ namespace MathTasks.Controllers.AlterMathTasks
     {
         private readonly IMediator _mediator;
 
-        public AlterMathTasksController(IMediator mediator)
-        {
-            _mediator = mediator;
-        }
+        public AlterMathTasksController(IMediator mediator) => _mediator = mediator;
 
-        public async Task<IActionResult> Index()
-        {
-            var models = await _mediator.Send(new GetMathTaskViewModelsQuery());
-            return View(models);
-        }
+        public async Task<IActionResult> Index() => 
+            View(await _mediator.Send(new GetMathTaskViewModelsQuery(), HttpContext.RequestAborted));
 
-        public IActionResult Show(Guid id)
-        {
-            return View();
-        }
+        public async Task<IActionResult> Show(Guid id) => 
+            View(await _mediator.Send(new GetMathTaskViewModelByIdQuery { Id = id }, HttpContext.RequestAborted));
     }
 }
