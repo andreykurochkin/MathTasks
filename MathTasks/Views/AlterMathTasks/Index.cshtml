@@ -1,4 +1,4 @@
-﻿@model IEnumerable<MathTaskViewModel>
+﻿@model IEnumerable<MathTasks.ViewModels.MathTaskViewModel>
 
 @{
     Layout = "_Layout";
@@ -9,7 +9,7 @@
 {
     @foreach(var mathTask in Model)
     {
-        <partial name="_MathTask" model="mathTask" />
+        <partial name="_MathTask" model="mathTask" view-data="ViewData"/>
     }
 }
 

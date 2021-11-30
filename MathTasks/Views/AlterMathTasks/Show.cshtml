@@ -1,5 +1,8 @@
 ﻿@using MathTasks.ViewModels
 @model MathTaskViewModel
+@{
+    ViewData["DoHideLink"] = true;
+}
 @if (Model is null)
 {
     <h1>Error while processing request ...</h1>

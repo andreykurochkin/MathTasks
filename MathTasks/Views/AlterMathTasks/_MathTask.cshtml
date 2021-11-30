@@ -1,4 +1,7 @@
-﻿@model MathTaskViewModel
+﻿@model MathTasks.ViewModels.MathTaskViewModel
+@{
+    //ViewData["DoHideLink"] = false;
+}
 <div class="card my-3">
     <div class="card-header">
         <div class="row">
@@ -7,7 +10,7 @@
             </div>
             <div class="col">
                 <div class="float-end">
-                    <partial name="_MathTaskLink" model="Model.Id" />
+                    <partial name="_MathTaskLink" model="Model.Id" view-data="ViewData"/>
                 </div>
             </div>
         </div>
