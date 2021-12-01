@@ -19,7 +19,6 @@ namespace MathTasks.Controllers.AlterMathTasks
             var query = new GetMathTaskViewModelsQuery { Tag = tag };
             var viewModels = await _mediator.Send(query, HttpContext.RequestAborted);
             return View(viewModels);
-            // return View(await _mediator.Send(new GetMathTaskViewModelsQuery(), HttpContext.RequestAborted));
         }
 
         public async Task<IActionResult> Show(Guid id) =>

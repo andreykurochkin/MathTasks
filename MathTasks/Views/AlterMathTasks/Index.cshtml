@@ -13,9 +13,10 @@
 
     @if (!string.IsNullOrEmpty(GetTag()))
     {
-        <a asp-controller="AlterMathTasks" asp-action="Index" asp-route-tag="@GetTag()" asp-route-search="">
+        <a asp-controller="AlterMathTasks" asp-action="Index" asp-route-tag="" asp-route-search="">
             <span class="badge rounded-pill bg-danger">
                 @GetTag()
+                <i class="fa fa-times"></i>
             </span>
         </a>
     }
