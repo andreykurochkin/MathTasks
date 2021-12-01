@@ -11,6 +11,15 @@
         math tasks found <span class="badge bg-secondary">@Model.Count()</span>
     </button>
 
+    @if (!string.IsNullOrEmpty(GetTag()))
+    {
+        <a asp-controller="AlterMathTasks" asp-action="Index" asp-route-tag="@GetTag()" asp-route-search="">
+            <span class="badge rounded-pill bg-danger">
+                @GetTag()
+            </span>
+        </a>
+    }
+
     @foreach (var mathTask in Model)
     {
         <partial name="_MathTask" model="mathTask" view-data="ViewData" />
@@ -18,6 +27,5 @@
 }
 
 @functions {
-
+    private string GetTag() => ViewData["tag"]?.ToString() ?? string.Empty;
 }
-
