@@ -7,9 +7,17 @@
 
 @if (Model is not null)
 {
-    @foreach(var mathTask in Model)
+    <button type="button" class="btn btn-primary">
+        math tasks found <span class="badge bg-secondary">@Model.Count()</span>
+    </button>
+
+    @foreach (var mathTask in Model)
     {
-        <partial name="_MathTask" model="mathTask" view-data="ViewData"/>
+        <partial name="_MathTask" model="mathTask" view-data="ViewData" />
     }
+}
+
+@functions {
+
 }
 
