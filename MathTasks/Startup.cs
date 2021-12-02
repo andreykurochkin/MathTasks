@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
+using MathTasks.Infrastructure.Services;
 
 namespace MathTasks
 {
@@ -57,6 +58,9 @@ namespace MathTasks
 
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            // dependency injection
+            services.AddTransient<ITagService, TagService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
