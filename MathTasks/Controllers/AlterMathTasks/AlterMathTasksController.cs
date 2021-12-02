@@ -21,10 +21,8 @@ namespace MathTasks.Controllers.AlterMathTasks
         public async Task<IActionResult> Show(Guid id) => 
             View(await _mediator.Send(new GetMathTaskViewModelByIdQuery { Id = id }, HttpContext.RequestAborted));
 
-        public async Task<IActionResult> Cloud()
-        {
-            var tags = await _tagService.GetCloudAsync();
-            return View(tags);
-        }
+        public IActionResult Cloud() => View();
+
+        public async Task<IActionResult> CloudViaView() => View(await _tagService.GetCloudAsync());
     }
 }

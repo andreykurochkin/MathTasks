@@ -1,0 +1,17 @@
+﻿@model IEnumerable<TagCloudViewModel>
+
+@{
+    ViewData["Title"] = "Tags cloud";
+}
+
+<h1>Hello from view component</h1> 
+
+@if((Model is not null) && Model.Any())
+{
+    <div class="mb-5">
+        @foreach(var item in Model)
+        {
+            <a class="@item.CssClass badge bg-light text-dark my-2" href="#" title="@item.Weight">@item.Name</a>
+        }
+    </div>
+}
