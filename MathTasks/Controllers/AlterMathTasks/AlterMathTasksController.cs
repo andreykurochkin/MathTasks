@@ -21,7 +21,10 @@ namespace MathTasks.Controllers.AlterMathTasks
             return View(viewModels);
         }
 
-        public async Task<IActionResult> Show(Guid id) =>
-            View(await _mediator.Send(new GetMathTaskViewModelByIdQuery { Id = id }, HttpContext.RequestAborted));
+        public async Task<IActionResult> Show(Guid id, string? returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View(await _mediator.Send(new GetMathTaskViewModelByIdQuery { Id = id }, HttpContext.RequestAborted));
+        }
     }
 }
