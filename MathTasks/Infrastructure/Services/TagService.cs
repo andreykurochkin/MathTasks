@@ -30,6 +30,28 @@ namespace MathTasks.Infrastructure.Services
                     Weight = entity.MathTasks == null ? 0 : entity.MathTasks.Count
                 });
             return viewModels;
+
+
+            var foo = new TagCloudViewModelCluster(9, (t) => t.Weight, new List<TagCloudViewModel> { new() });
+        }
+    }
+
+    public class ClusterOptions<T>
+    {
+
+    }
+
+    /// <summary>
+    /// Generates cluster
+    /// for each instance of TagCloudViewModel creates a number
+    /// numbers belong to the range from 0 to count - 1
+    /// </summary>
+    public class TagCloudViewModelCluster
+    {
+        private readonly int _startIndex = 0;
+        public TagCloudViewModelCluster(int endIndex, Func<TagCloudViewModel, int> onMember, IEnumerable<TagCloudViewModel> items)
+        {
+
         }
     }
 }
