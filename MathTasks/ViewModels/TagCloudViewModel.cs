@@ -10,6 +10,6 @@ namespace MathTasks.ViewModels
 
         public string? CssClass { get; set; }
 
-        public int Weight { get; set; }
+        public int Total { get; set; }
     }
 }

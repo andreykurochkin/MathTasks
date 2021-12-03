@@ -27,32 +27,35 @@ namespace MathTasks.Infrastructure.Services
                     Id = entity.Id,
                     Name = entity.Name,
                     CssClass = string.Empty,
-                    Weight = entity.MathTasks == null ? 0 : entity.MathTasks.Count
+                    Total = entity.MathTasks == null ? 0 : entity.MathTasks.Count
                 });
-            return viewModels;
+
+            var options = new ClusterOptions<TagCloudViewModel>((t) => t.Total);
+            var cluster = new Cluster<TagCloudViewModel>(options, viewModels).ToList();
+
+            cluster.ForEach(tuple => tuple.Item2.CssClass = $"tag{tuple.Item1}");
+            
+            return cluster.Select(tuple => tuple.Item2);
         }
     }
 
     public class ClusterOptions<T>
     {
-        //private readonly int _startIndex = 0;
-        //private readonly int _endIndex = 0;
-
+        /// <summary>
+        /// specifies property of T class which value is gonna be taken in order to build cluster
+        /// </summary>
         public Func<T, int> OnMember { get; }
+
+        /// <summary>
+        /// specifies number of clusters gonna be processed
+        /// </summary>
         public int UpperBoundOfClusters { get; }
 
-        public ClusterOptions(Func<T, int> onMember, int upperBoundOfClusters)
-        {
-            //_endIndex = upperBoundOfClusters - 1;
-            OnMember = onMember;
-            UpperBoundOfClusters = upperBoundOfClusters;
-        }
+        public ClusterOptions(Func<T, int> onMember, int upperBoundOfClusters = 10) => (OnMember, UpperBoundOfClusters) = (onMember, upperBoundOfClusters);
     }
 
     /// <summary>
-    /// Generates cluster
-    /// for each instance of TagCloudViewModel creates a number
-    /// numbers belong to the range from 0 to count - 1
+    /// Generates list of tuples, where tuple.Item1 is number of cluster, tuple.Item2 is instance of T
     /// </summary>
     public class Cluster<T>
     {
@@ -67,9 +70,17 @@ namespace MathTasks.Infrastructure.Services
 
         public List<Tuple<int, T>> ToList()
         {
-            var orderedItems = _items.OrderBy(_options.OnMember).ToList();
+            var result = new List<Tuple<int, T>>();
+            CreateClusters().Select((ListOfT, @Index) => new { @Index, ListOfT })
+                .ToList()
+                .ForEach(anonym => result.AddRange(anonym.ListOfT.Select(instanceOfT => new Tuple<int, T>(anonym.Index, instanceOfT))));
+            return result;
+        }
 
+        private List<List<T>> CreateClusters()
+        {
             var clusters = new List<List<T>>();
+            var orderedItems = _items.OrderBy(_options.OnMember).ToList();
             if (orderedItems.Any())
             {
                 var min = orderedItems.Min(_options.OnMember);
@@ -90,14 +101,7 @@ namespace MathTasks.Infrastructure.Services
                 }
                 clusters.Add(cluster);
             }
-
-            var result = new List<Tuple<int, T>>();
-
-            clusters.Select((ListOfT, @Index) => new { @Index, ListOfT })
-                .ToList()
-                .ForEach(anonym => result.AddRange(anonym.ListOfT.Select(instanceOfT => new Tuple<int, T>(anonym.Index, instanceOfT))));
-
-            return result;
+            return clusters;
         }
     }
 }

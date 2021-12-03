@@ -10,7 +10,8 @@
     <div class="mb-5">
         @foreach(var item in Model)
         {
-            <a class="@item.CssClass badge bg-light text-dark my-2" href="#" title="@item.Weight">@item.Name</a>
+            <a class="@item.CssClass badge bg-light text-dark my-2" href="@Url.Action("Index", "AlterMathTasks", new { tag = item.Name})" title="@item.Total">@item.Name</a>
+            @*<a class="@item.CssClass" href="@Url.Action("Index", "AlterMathTasks", new { tag = item.Name})" title="@item.Total">@item.Name</a>*@
         }
     </div>
 }
