@@ -30,12 +30,17 @@ namespace MathTasks.Infrastructure.Services
                     Total = entity.MathTasks == null ? 0 : entity.MathTasks.Count
                 });
 
-            var options = new ClusterOptions<TagCloudViewModel>((t) => t.Total);
-            var cluster = new Cluster<TagCloudViewModel>(options, viewModels).ToList();
+            var cluster = new Cluster<TagCloudViewModel>(options => 
+                {
+                    options.OnMember = (t) => t.Total;
+                    options.UpperBoundOfClusters = 10;
+                }
+            );
 
-            cluster.ForEach(tuple => tuple.Item2.CssClass = $"tag{tuple.Item1}");
-            
-            return cluster.Select(tuple => tuple.Item2);
+            var clusterResult = cluster.ToList(viewModels);
+            clusterResult.ForEach(tuple => tuple.Item2.CssClass = $"tag{tuple.Item1}");
+
+            return clusterResult.Select(tuple => tuple.Item2);
         }
     }
 
@@ -44,14 +49,16 @@ namespace MathTasks.Infrastructure.Services
         /// <summary>
         /// specifies property of T class which value is gonna be taken in order to build cluster
         /// </summary>
-        public Func<T, int> OnMember { get; }
+        public Func<T, int> OnMember { get; set; }
 
         /// <summary>
         /// specifies number of clusters gonna be processed
         /// </summary>
-        public int UpperBoundOfClusters { get; }
+        public int UpperBoundOfClusters { get; set; }
 
-        public ClusterOptions(Func<T, int> onMember, int upperBoundOfClusters = 10) => (OnMember, UpperBoundOfClusters) = (onMember, upperBoundOfClusters);
+        //public ClusterOptions(Func<T, int> onMember, int upperBoundOfClusters = 10) => (OnMember, UpperBoundOfClusters) = (onMember, upperBoundOfClusters);
+
+        public ClusterOptions(int upperBoundOfClusters = 10) { }
     }
 
     /// <summary>
@@ -59,28 +66,27 @@ namespace MathTasks.Infrastructure.Services
     /// </summary>
     public class Cluster<T>
     {
-        private readonly ClusterOptions<T> _options;
-        private readonly IEnumerable<T> _items;
+        private readonly ClusterOptions<T> _options = new();
 
-        public Cluster(ClusterOptions<T> options, IEnumerable<T> items)
-        {
-            _options = options;
-            _items = items;
+        public Cluster(Action<ClusterOptions<T>> configureOptions) { 
+            configureOptions(_options); 
         }
 
-        public List<Tuple<int, T>> ToList()
+        //public Cluster(ClusterOptions<T> options) => _options = options;
+
+        public List<Tuple<int, T>> ToList(IEnumerable<T> items)
         {
             var result = new List<Tuple<int, T>>();
-            CreateClusters().Select((ListOfT, @Index) => new { @Index, ListOfT })
+            CreateClusters(items).Select((ListOfT, @Index) => new { @Index, ListOfT })
                 .ToList()
                 .ForEach(anonym => result.AddRange(anonym.ListOfT.Select(instanceOfT => new Tuple<int, T>(anonym.Index, instanceOfT))));
             return result;
         }
 
-        private List<List<T>> CreateClusters()
+        private List<List<T>> CreateClusters(IEnumerable<T> items)
         {
             var clusters = new List<List<T>>();
-            var orderedItems = _items.OrderBy(_options.OnMember).ToList();
+            var orderedItems = items.OrderBy(_options.OnMember).ToList();
             if (orderedItems.Any())
             {
                 var min = orderedItems.Min(_options.OnMember);
