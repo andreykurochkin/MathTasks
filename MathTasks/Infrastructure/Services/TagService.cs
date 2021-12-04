@@ -1,5 +1,8 @@
-﻿using MathTasks.Data;
+﻿using MathTasks.Controllers.AlterMathTasks.Queries;
+using MathTasks.Data;
 using MathTasks.ViewModels;
+using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -10,27 +13,20 @@ namespace MathTasks.Infrastructure.Services
 {
     public class TagService : ITagService
     {
-        private readonly ApplicationDbContext _applicationDbContext;
+        private readonly IMediator _mediatr;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public TagService(ApplicationDbContext applicationDbContext)
-        {
-            _applicationDbContext = applicationDbContext;
-        }
+        //private readonly ApplicationDbContext _applicationDbContext;
 
+        //public TagService(ApplicationDbContext applicationDbContext)
+        //{
+        //    _applicationDbContext = applicationDbContext;
+        //}
+        public TagService(IMediator mediatr, IHttpContextAccessor httpContextAccessor) => (_mediatr, _httpContextAccessor) = (mediatr, httpContextAccessor);
         public async Task<IEnumerable<TagCloudViewModel>> GetCloudAsync()
         {
-            var viewModels = (await _applicationDbContext.Tags
-                .Include(t => t.MathTasks)
-                .ToListAsync())
-                .Select(entity => new TagCloudViewModel
-                {
-                    Id = entity.Id,
-                    Name = entity.Name,
-                    CssClass = string.Empty,
-                    Total = entity.MathTasks == null ? 0 : entity.MathTasks.Count
-                });
-
-            var cluster = new Cluster<TagCloudViewModel>(options => 
+            var viewModels = await _mediatr.Send(new GetTagCloudViewModelQuery(), _httpContextAccessor.HttpContext.RequestAborted);
+            var cluster = new Cluster<TagCloudViewModel>(options =>
                 {
                     options.OnMember = (t) => t.Total;
                     options.UpperBoundOfClusters = 10;
@@ -42,6 +38,31 @@ namespace MathTasks.Infrastructure.Services
 
             return clusterResult.Select(tuple => tuple.Item2);
         }
+        //public async Task<IEnumerable<TagCloudViewModel>> GetCloudAsync()
+        //{
+        //    var viewModels = (await _applicationDbContext.Tags
+        //        .Include(t => t.MathTasks)
+        //        .ToListAsync())
+        //        .Select(entity => new TagCloudViewModel
+        //        {
+        //            Id = entity.Id,
+        //            Name = entity.Name,
+        //            CssClass = string.Empty,
+        //            Total = entity.MathTasks == null ? 0 : entity.MathTasks.Count
+        //        });
+
+        //    var cluster = new Cluster<TagCloudViewModel>(options => 
+        //        {
+        //            options.OnMember = (t) => t.Total;
+        //            options.UpperBoundOfClusters = 10;
+        //        }
+        //    );
+
+        //    var clusterResult = cluster.ToList(viewModels);
+        //    clusterResult.ForEach(tuple => tuple.Item2.CssClass = $"tag{tuple.Item1}");
+
+        //    return clusterResult.Select(tuple => tuple.Item2);
+        //}
     }
 
     public class ClusterOptions<T>

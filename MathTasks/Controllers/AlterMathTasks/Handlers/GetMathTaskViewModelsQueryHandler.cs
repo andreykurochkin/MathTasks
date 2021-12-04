@@ -12,12 +12,12 @@ using System.Threading.Tasks;
 
 namespace MathTasks.Controllers.AlterMathTasks.Handlers
 {
-    public class GetMathTaskViewModelsHandler : IRequestHandler<GetMathTaskViewModelsQuery, IEnumerable<MathTaskViewModel>>
+    public class GetMathTaskViewModelsQueryHandler : IRequestHandler<GetMathTaskViewModelsQuery, IEnumerable<MathTaskViewModel>>
     {
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _context;
 
-        public GetMathTaskViewModelsHandler(IMapper mapper, ApplicationDbContext context)
+        public GetMathTaskViewModelsQueryHandler(IMapper mapper, ApplicationDbContext context)
         {
             _mapper = mapper;
             _context = context;
