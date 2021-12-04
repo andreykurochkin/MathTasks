@@ -1,7 +1,6 @@
-﻿@using MathTasks.ViewModels
-@model IEnumerable<TagViewModel>
+﻿@model IEnumerable<MathTasks.ViewModels.TagViewModel>
 
-@foreach(var tag in Model)
+@foreach (var tag in Model)
 {
     @*<span class="badge badge-pill alert-primary">@tag.Name</span>*@
     <a asp-controller="AlterMathTasks" asp-action="Index" asp-route-tag="@tag.Name" class="badge badge-pill alert-primary" style="text-decoration:none">@tag.Name</a>

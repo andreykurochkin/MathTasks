@@ -1,9 +1,10 @@
-﻿@model Guid
+﻿@using MathTasks.Extensions
+@model Guid
 @if (ViewData["DoHideLink"] is not null)
 {
     <span>Hidden</span>
 }
 else
 {
-    <a asp-controller="AlterMathTasks" asp-action="Show" asp-route-id="@Model">View</a>
+    <a asp-controller="AlterMathTasks" asp-action="Show" asp-route-id="@Model" asp-route-returnUrl="@Context.GetReturnUrl()">View</a>
 }

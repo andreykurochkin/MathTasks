@@ -15,14 +15,15 @@ namespace MathTasks.Controllers.AlterMathTasks
 
         public AlterMathTasksController(IMediator mediator, ITagService tagService) => (_mediator, _tagService) = (mediator, tagService);
 
-        public async Task<IActionResult> Index() => 
-            View(await _mediator.Send(new GetMathTaskViewModelsQuery(), HttpContext.RequestAborted));
+        public async Task<IActionResult> Index(string tag)
+        {
+            ViewData["tag"] = tag;
+            var query = new GetMathTaskViewModelsQuery { Tag = tag };
+            var viewModels = await _mediator.Send(query, HttpContext.RequestAborted);
+            return View(viewModels);
+        }
 
         public async Task<IActionResult> Show(Guid id) => 
             View(await _mediator.Send(new GetMathTaskViewModelByIdQuery { Id = id }, HttpContext.RequestAborted));
-
-        public IActionResult Cloud() => View();
-
-        public async Task<IActionResult> CloudViaView() => View(await _tagService.GetCloudAsync());
     }
 }

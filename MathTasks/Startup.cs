@@ -56,11 +56,9 @@ namespace MathTasks
 
             services.AddMediatR(typeof(Startup));
 
-            services.AddControllersWithViews();
-            services.AddRazorPages();
+            services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
-            // dependency injection
-            services.AddTransient<ITagService, TagService>();
+            services.AddRazorPages();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
