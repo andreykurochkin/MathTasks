@@ -59,6 +59,9 @@ namespace MathTasks
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
             services.AddRazorPages();
+
+            // dependency injection
+            services.AddTransient<ITagService, TagService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
