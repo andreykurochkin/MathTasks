@@ -16,13 +16,8 @@ namespace MathTasks.Infrastructure.Services
         private readonly IMediator _mediatr;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        //private readonly ApplicationDbContext _applicationDbContext;
-
-        //public TagService(ApplicationDbContext applicationDbContext)
-        //{
-        //    _applicationDbContext = applicationDbContext;
-        //}
         public TagService(IMediator mediatr, IHttpContextAccessor httpContextAccessor) => (_mediatr, _httpContextAccessor) = (mediatr, httpContextAccessor);
+        
         public async Task<IEnumerable<TagCloudViewModel>> GetCloudAsync()
         {
             var viewModels = await _mediatr.Send(new GetTagCloudViewModelQuery(), _httpContextAccessor.HttpContext.RequestAborted);
@@ -38,31 +33,6 @@ namespace MathTasks.Infrastructure.Services
 
             return clusterResult.Select(tuple => tuple.Item2);
         }
-        //public async Task<IEnumerable<TagCloudViewModel>> GetCloudAsync()
-        //{
-        //    var viewModels = (await _applicationDbContext.Tags
-        //        .Include(t => t.MathTasks)
-        //        .ToListAsync())
-        //        .Select(entity => new TagCloudViewModel
-        //        {
-        //            Id = entity.Id,
-        //            Name = entity.Name,
-        //            CssClass = string.Empty,
-        //            Total = entity.MathTasks == null ? 0 : entity.MathTasks.Count
-        //        });
-
-        //    var cluster = new Cluster<TagCloudViewModel>(options => 
-        //        {
-        //            options.OnMember = (t) => t.Total;
-        //            options.UpperBoundOfClusters = 10;
-        //        }
-        //    );
-
-        //    var clusterResult = cluster.ToList(viewModels);
-        //    clusterResult.ForEach(tuple => tuple.Item2.CssClass = $"tag{tuple.Item1}");
-
-        //    return clusterResult.Select(tuple => tuple.Item2);
-        //}
     }
 
     public class ClusterOptions<T>
@@ -77,8 +47,6 @@ namespace MathTasks.Infrastructure.Services
         /// </summary>
         public int UpperBoundOfClusters { get; set; }
 
-        //public ClusterOptions(Func<T, int> onMember, int upperBoundOfClusters = 10) => (OnMember, UpperBoundOfClusters) = (onMember, upperBoundOfClusters);
-
         public ClusterOptions(int upperBoundOfClusters = 10) { }
     }
 
@@ -89,20 +57,12 @@ namespace MathTasks.Infrastructure.Services
     {
         private readonly ClusterOptions<T> _options = new();
 
-        public Cluster(Action<ClusterOptions<T>> configureOptions) { 
-            configureOptions(_options); 
-        }
+        public Cluster(Action<ClusterOptions<T>> configureOptions) => configureOptions(_options);
 
-        //public Cluster(ClusterOptions<T> options) => _options = options;
-
-        public List<Tuple<int, T>> ToList(IEnumerable<T> items)
-        {
-            var result = new List<Tuple<int, T>>();
-            CreateClusters(items).Select((ListOfT, @Index) => new { @Index, ListOfT })
-                .ToList()
-                .ForEach(anonym => result.AddRange(anonym.ListOfT.Select(instanceOfT => new Tuple<int, T>(anonym.Index, instanceOfT))));
-            return result;
-        }
+        public List<Tuple<int, T>> ToList(IEnumerable<T> items) => 
+            CreateClusters(items)
+                .SelectMany((ListOfT, @IndexOfCluster) => ListOfT.Select(t => new Tuple<int, T>(IndexOfCluster, t)))
+                .ToList();
 
         private List<List<T>> CreateClusters(IEnumerable<T> items)
         {
