@@ -71,10 +71,6 @@ body {
 }
 
 
-a.tag0, a.tag1, a.tag2, a.tag3, a.tag4, a.tag5, a.tag6, a.tag7, a.tag8, a.tag9 {
-    text-decoration: none;
-}
-
 a.tag0 {
     font-size: 1.1em;
 }
