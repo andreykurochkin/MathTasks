@@ -7,17 +7,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MathTasks.Extensions;
+using Serilog;
+using Serilog.Events;
 
-namespace MathTasks {
-    public class Program {
-        public static void Main(string[] args) {
-            CreateHostBuilder(args).Build().SeedData().Run();
+namespace MathTasks;
+public static class Program
+{
+    public static async Task<int> Main(string[] args)
+    {
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+            .Enrich.FromLogContext()
+            .WriteTo.Console()
+            .CreateLogger();
+        try
+        {
+            Log.Information("Starting a web host");
         }
+        catch (Exception)
+        {
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder => {
-                    webBuilder.UseStartup<Startup>();
-                });
+            throw;
+        }
+        CreateHostBuilder(args).Build().SeedData().Run();
+        return 0;
     }
+
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>();
+            });
+
 }

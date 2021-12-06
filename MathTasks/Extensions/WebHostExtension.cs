@@ -15,11 +15,24 @@ namespace MathTasks.Extensions
         public static IHost SeedData(this IHost host)
         {
             using var scope = host.Services.CreateScope();
-            var services = scope.ServiceProvider;
-            var context = services.GetService(typeof(ApplicationDbContext));
+            var context = scope.ServiceProvider
+                .GetService(typeof(ApplicationDbContext));
             new StartupEntities(context as ApplicationDbContext).Seed();
             return host;
         }
+    }
+
+    // CreateEntity - Factory
+    // 
+
+    public interface ISeedItem
+    {
+        public void Seed();
+    }
+
+    public interface ISeedValidation
+    {
+        public bool Validate();
     }
 
     public class StartupEntities
@@ -35,10 +48,11 @@ namespace MathTasks.Extensions
             _context = applicationDbContext;
             _tags = CreateEntities<Tag>(TagsCount, EntityFactory.CreateTag);
             _mathTasks = CreateEntities<MathTask>(MathTasksCount, EntityFactory.CreateMathTask);
+            InitializeNavigationProperties();
         }
         private bool IsSeeded()
         {
-            if (_context.Tags.Count() != 0)
+            if (_context?.Tags.Count() != 0)
             {
                 return true;
             }
@@ -54,9 +68,8 @@ namespace MathTasks.Extensions
             {
                 return;
             }
-            InitializeNavigationProperties();
-            _context.Tags.AddRange(_tags);
-            _context.MathTasks.AddRange(_mathTasks);
+            _context?.Tags.AddRange(_tags);
+            _context?.MathTasks.AddRange(_mathTasks);
             _context?.SaveChanges();
         }
         private void InitializeNavigationProperties() => _mathTasks.ForEach(t => t.Tags = _tags.ToRandomList());
