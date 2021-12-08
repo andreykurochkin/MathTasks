@@ -68,7 +68,7 @@ public class IdentityEntities
             return;
         }
 
-        // 2. Validate roles and  Create roles
+        // 2. Validate roles and Create roles
         foreach (var roleName in RoleNames)
         {
             if (!(await IsValidRoleName(_applicationDbContext!, roleName)))

@@ -10,14 +10,10 @@ namespace MathTasks.Data
 {
     public class ApplicationDbContext : DbContextBase
     {
-        private readonly string _topLevelDomain = ".com";
-
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-            : base(options)
-        {
-        }
-        public DbSet<MathTask> MathTasks { get; set; }
-        public DbSet<Tag> Tags { get; set; }
-        public DbSet<Notification> Notifications { get; set; }
+            : base(options) { }
+        public DbSet<MathTask>? MathTasks { get; set; }
+        public DbSet<Tag>? Tags { get; set; }
+        public DbSet<Notification>? Notifications { get; set; }
     }
 }

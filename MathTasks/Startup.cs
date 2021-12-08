@@ -62,6 +62,8 @@ namespace MathTasks
 
             // dependency injection
             services.AddTransient<ITagService, TagService>();
+
+            services.AddServerSideBlazor();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
