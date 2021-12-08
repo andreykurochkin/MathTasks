@@ -1,7 +1,7 @@
 ﻿using MathTasks.Models;
 using Tynamix.ObjectFiller;
 
-namespace MathTasks.Seed
+namespace MathTasks.Infrastructure.Fillers
 {
     public static class TagFillerConfiguration
     {

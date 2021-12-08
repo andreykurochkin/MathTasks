@@ -24,18 +24,24 @@ public static class Program
         try
         {
             Log.Information("Starting a web host");
+            var host = await CreateHostBuilder(args).Build().SeedData();
+            host.Run();
+            return 0;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-
-            throw;
+            Log.Fatal(ex, "Host terminated unexpectedly");
+            return 1;
         }
-        CreateHostBuilder(args).Build().SeedData().Run();
-        return 0;
+        finally
+        {
+            Log.CloseAndFlush();
+        }
     }
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
+            .UseSerilog()
             .ConfigureWebHostDefaults(webBuilder =>
             {
                 webBuilder.UseStartup<Startup>();
