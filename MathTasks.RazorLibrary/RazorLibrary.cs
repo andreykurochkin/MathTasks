@@ -9,14 +9,14 @@ namespace MathTasks.RazorLibrary
     // This class can be registered as scoped DI service and then injected into Blazor
     // components for use.
 
-    public class ExampleJsInterop : IAsyncDisposable
+    public class RazorLibrary : IAsyncDisposable
     {
         private readonly Lazy<Task<IJSObjectReference>> moduleTask;
 
-        public ExampleJsInterop(IJSRuntime jsRuntime)
+        public RazorLibrary(IJSRuntime jsRuntime)
         {
             moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
-               "import", "./_content/MathTasks.RazorLibrary/exampleJsInterop.js").AsTask());
+               "import", "./_content/MathTasks.RazorLibrary/razorLibrary.js").AsTask());
         }
 
         public async ValueTask<string> Prompt(string message)
