@@ -2,6 +2,7 @@
 using MathTasks.Infrastructure.Services;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.JSInterop;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,8 +13,13 @@ namespace MathTasks.Controllers.AlterMathTasks
     {
         private readonly IMediator _mediator;
         private readonly ITagService _tagService;
+        private readonly IJSRuntime _jSRuntime;
 
-        public AlterMathTasksController(IMediator mediator, ITagService tagService) => (_mediator, _tagService) = (mediator, tagService);
+        public AlterMathTasksController(IMediator mediator, ITagService tagService, IJSRuntime jSRuntime)
+        {
+            (_mediator, _tagService) = (mediator, tagService);
+            _jSRuntime = jSRuntime;
+        }
 
         public async Task<IActionResult> Index(string tag)
         {
@@ -28,6 +34,11 @@ namespace MathTasks.Controllers.AlterMathTasks
 
         public IActionResult Cloud() => View();
 
-        public async Task<IActionResult> CloudViaView() => View(await _tagService.GetCloudAsync());
+        //public async Task<IActionResult> CloudViaView() => View(await _tagService.GetCloudAsync());
+        public async Task<IActionResult> ActionResult()
+        {
+            var interop = new RazorLibrary.RazorInterop(_jSRuntime);
+            return View(interop);
+        }
     }
 }

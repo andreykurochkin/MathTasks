@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MathTasks", "MathTasks\Math
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MathTasks.Tests", "MathTasks.Tests\MathTasks.Tests.csproj", "{50DB71FE-B6E7-48B5-A508-C43846A1B0B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MathTasks.RazorLibrary", "MathTasks.RazorLibrary\MathTasks.RazorLibrary.csproj", "{3035C4E1-8D2B-4A8A-B965-419277EEB493}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MathTasks.RazorLibrary", "MathTasks.RazorLibrary\MathTasks.RazorLibrary.csproj", "{3035C4E1-8D2B-4A8A-B965-419277EEB493}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

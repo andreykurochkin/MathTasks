@@ -1,8 +1,10 @@
 ﻿@using MathTasks.Extensions
+@using MathTasks.RazorLibrary
 @model Guid
 @if (ViewData["DoHideLink"] is not null)
 {
-    <span>Hidden</span>
+    <component type="typeof(MathTaskLinkComponent)" render-mode=ServerPrerendered 
+        param-LinkValue="@Url.ActionLink("Show", "AlterMathTasks", new {id= Model})" />
 }
 else
 {
