@@ -5,13 +5,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MathTasks.Models {
-    public class MathTask : Auditable {
+namespace MathTasks.Models
+{
+    public class MathTask : Auditable
+    {
         public Guid Id { get; set; }
-        public string Theme { get; set; }
-        public string Content { get; set; }
+        public string Theme { get; set; } = null!;
+
+        public string Content { get; set; } = null!;
         public ICollection<Tag> Tags { get; set; }
-        public MathTask() {
+        public MathTask()
+        {
 
         }
     }
