@@ -15,7 +15,7 @@ namespace MathTasks.ViewModels
         public string ReturnUrl { get; set; } = null!;
 
         [Display(Name ="Tags of Math Task")]
-        public IEnumerable<Tag> Tags { get; set; } = null!;
+        public IEnumerable<string> Tags { get; set; } = null!;
 
         [Display(Name = "Tags of Math Task")]
         [Range(1,8, ErrorMessage ="Up to 8 Tags needed")]
