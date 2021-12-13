@@ -1,9 +1,11 @@
 ﻿using MathTasks.Controllers.AlterMathTasks.Queries;
 using MathTasks.Infrastructure.Services;
+using MathTasks.Models;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.JSInterop;
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -39,6 +41,14 @@ namespace MathTasks.Controllers.AlterMathTasks
         {
             var interop = new RazorLibrary.RazorInterop(_jSRuntime);
             return View(interop);
+        }
+
+        public async Task<IActionResult> Edit(Guid id, string returnUrl)
+        {
+            var result = await _mediator.Send(new GetMathTaskByIdForEditQuery(id, returnUrl));
+            return (result is null)
+                ? View(result)
+                : View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

@@ -31,7 +31,7 @@ namespace MathTasks.Tests
         [Fact]
         [Trait("Automapper", "Mapper configuration")]
         public void GetMapperConfiguration_ShouldBeValid_WhenDataIsValid()
-        {
+        {   
             var result = _sut.GetMapperConfiguration();
 
             result.AssertConfigurationIsValid();
