@@ -1,0 +1,19 @@
+﻿@using MathTasks.Extensions
+@using MathTasks.Seed
+@using MathTasks.Infrastructure
+@model Guid
+@{
+    bool? isAuthenticatedUser = User?.Identity?.IsAuthenticated;
+    bool? isAdministrator = User?.IsInRole(IdentityEntities.AdministratorRoleName);
+    bool Validate = true; /*isAdministrator && isAdministrator;*/
+}
+
+@if (Validate)
+{
+    <a asp-controller="AlterMathTasks"
+   asp-action="Edit"
+   asp-route-id="@Model"
+   asp-route-returnUrl="@Context.GetReturnUrl()#Model">
+        Edit
+    </a>
+}

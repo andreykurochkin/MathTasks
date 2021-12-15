@@ -1,6 +1,7 @@
 ﻿using MathTasks.Controllers.AlterMathTasks.Queries;
 using MathTasks.Infrastructure.Services;
 using MathTasks.Models;
+using MathTasks.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.JSInterop;
@@ -31,13 +32,14 @@ namespace MathTasks.Controllers.AlterMathTasks
             return View(viewModels);
         }
 
-        public async Task<IActionResult> Show(Guid id) => 
+        public async Task<IActionResult> Show(Guid id) =>
             View(await _mediator.Send(new GetMathTaskViewModelByIdQuery { Id = id }, HttpContext.RequestAborted));
 
         public IActionResult Cloud() => View();
 
         //public async Task<IActionResult> CloudViaView() => View(await _tagService.GetCloudAsync());
-        public async Task<IActionResult> ActionResult()
+
+        public IActionResult ActionResult()
         {
             var interop = new RazorLibrary.RazorInterop(_jSRuntime);
             return View(interop);
@@ -47,8 +49,14 @@ namespace MathTasks.Controllers.AlterMathTasks
         {
             var result = await _mediator.Send(new GetMathTaskByIdForEditQuery(id, returnUrl));
             return (result is null)
-                ? View(result)
-                : View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                ? View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier })
+                : View(result);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(MathTaskEditViewModel model)
+        {
+            return (ModelState.IsValid) ? View(model) : View(model.ReturnUrl);
         }
     }
 }

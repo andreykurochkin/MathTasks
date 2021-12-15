@@ -3,10 +3,23 @@
 @model Guid
 @if (ViewData["DoHideLink"] is not null)
 {
-    <component type="typeof(MathTaskLinkComponent)" render-mode=ServerPrerendered 
-        param-LinkValue="@Url.ActionLink("Show", "AlterMathTasks", new {id= Model})" />
+    <component 
+        type="typeof(MathTaskLinkComponent)"
+        render-mode=ServerPrerendered
+        param-LinkValue="@Url.ActionLink(
+            "Show",
+            "AlterMathTasks",
+            new {id= Model}
+        )" 
+    />
 }
 else
 {
-    <a asp-controller="AlterMathTasks" asp-action="Show" asp-route-id="@Model" asp-route-returnUrl="@Context.GetReturnUrl()">View</a>
+    <a 
+        asp-controller="AlterMathTasks"
+        asp-action="Show"
+        asp-route-id="@Model" 
+        asp-route-returnUrl="@Context.GetReturnUrl()">
+        View
+    </a>
 }

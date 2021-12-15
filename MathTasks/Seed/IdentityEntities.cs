@@ -11,10 +11,10 @@ namespace MathTasks.Seed;
 
 public class IdentityEntities
 {
-    private const string AdministratorRoleName = "Administrator";
-    private const string RegisteredUserRoleName = "RegisteredUser";
-    private const string AdministratorUserEmail = "dev@gmail.com";
-    private const string RegisteredUserEmail = "registeredUser@gmail.com";
+    public const string AdministratorRoleName = "Administrator";
+    public const string RegisteredUserRoleName = "RegisteredUser";
+    public const string AdministratorUserEmail = "dev@gmail.com";
+    public const string RegisteredUserEmail = "registeredUser@gmail.com";
     private readonly ApplicationDbContext? _applicationDbContext;
     private readonly UserManager<IdentityUser> _userManager;
     private readonly UserStore<IdentityUser> _userStore;
@@ -107,13 +107,13 @@ public class IdentityEntities
         await _applicationDbContext!.SaveChangesAsync();
     }
 
-    private async Task<bool> IsValidRoleName(IdentityDbContext context, string roleName) => !(await context.Roles.AnyAsync(role => role.Name == roleName));
+    private static async Task<bool> IsValidRoleName(IdentityDbContext context, string roleName) => !(await context.Roles.AnyAsync(role => role.Name == roleName));
 
-    private static IdentityRole CreateIdentityRole(string roleName) => new IdentityRole(roleName) { NormalizedName = roleName.ToUpper() };
+    private static IdentityRole CreateIdentityRole(string roleName) => new(roleName) { NormalizedName = roleName.ToUpper() };
 
     private async Task<bool> HasUserWithSpecifiedEmail(string email) => !await _applicationDbContext!.Users.AnyAsync(u => u.Email == email);
 
-    private IdentityUser CreateIdentityUser(string email)
+    private static IdentityUser CreateIdentityUser(string email)
     {
         var user = new IdentityUser()
         {

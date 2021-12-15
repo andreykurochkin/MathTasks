@@ -10,7 +10,10 @@
             </div>
             <div class="col">
                 <div class="float-end">
-                    <partial name="_MathTaskLink" model="Model.Id" view-data="ViewData"/>
+                    <partial name="_MathTaskAction"
+                             model="Model!.Id"
+                             />
+                    <partial name="_MathTaskLink" model="Model!.Id" view-data="ViewData" />
                 </div>
             </div>
         </div>
@@ -19,17 +22,17 @@
         <div class="row">
             <div class="col">
                 <p class="lead">
-                    @Model?.Content
+                    @Model!.Content
                 </p>
                 <p>
-                    <partial name="_Tags" model="Model.Tags" />
+                    <partial name="_Tags" model="Model!.Tags" />
                 </p>
             </div>
         </div>
     </div>
 </div>
 
-@if(ViewData["ReturnUrl"] is not null)
+@if (ViewData["ReturnUrl"] is not null)
 {
-    <a href="@Url.Content(ViewData["ReturnUrl"].ToString())" class="btn btn-sm btn-outline-secondary">Back</a>
+    <a href="@Url.Content(ViewData["ReturnUrl"]!.ToString())" class="btn btn-sm btn-outline-secondary">Back</a>
 }
