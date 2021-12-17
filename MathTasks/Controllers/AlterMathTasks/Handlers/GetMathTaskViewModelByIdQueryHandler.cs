@@ -24,11 +24,11 @@ namespace MathTasks.Controllers.AlterMathTasks.Handlers
         }
         public async Task<MathTaskViewModel> Handle(GetMathTaskViewModelByIdQuery request, CancellationToken cancellationToken)
         {
-            var entity = await _context.MathTasks.Include(x => x.Tags)
+            var entity = await _context!.MathTasks!.Include(x => x.Tags)
                 .FirstOrDefaultAsync(x => x.Id == request.Id);
             if (entity is null)
             {
-                return default(MathTaskViewModel);
+                return default;
             }
             var mappedItem = _mapper.Map<MathTaskViewModel>(entity);
             return mappedItem;

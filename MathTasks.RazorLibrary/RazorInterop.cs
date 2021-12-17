@@ -11,29 +11,29 @@ namespace MathTasks.RazorLibrary
 
     public class RazorInterop : IAsyncDisposable
     {
-        private readonly Lazy<Task<IJSObjectReference>> moduleTask;
+        private readonly Lazy<Task<IJSObjectReference>> _moduleTask;
 
         public RazorInterop(IJSRuntime jsRuntime)
         {
-            moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
+            _moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>(
                "import", "./_content/MathTasks.RazorLibrary/razorLibrary.js").AsTask());
         }
 
         public async ValueTask<string> ShowToast(string message, string title, string type = "info")
         {
-            var module = await moduleTask.Value;
+            var module = await _moduleTask.Value;
             return await module.InvokeAsync<string>("showToast", message, title, type);
         }
 
         public async ValueTask<string> CopyToClipboard(string value)
         {
-            var module = await moduleTask.Value;
+            var module = await _moduleTask.Value;
             return await module.InvokeAsync<string>("copyToClipboard", value);
         }
 
         public async ValueTask SetTagsTotal(int value)
         {
-            var module = await moduleTask.Value;
+            var module = await _moduleTask.Value;
             await module.InvokeVoidAsync("setTagsTotal", "TotalTags", value);
         }
 
@@ -41,9 +41,9 @@ namespace MathTasks.RazorLibrary
 
         public async ValueTask DisposeAsync()
         {
-            if (moduleTask.IsValueCreated)
+            if (_moduleTask.IsValueCreated)
             {
-                var module = await moduleTask.Value;
+                var module = await _moduleTask.Value;
                 await module.DisposeAsync();
             }
         }

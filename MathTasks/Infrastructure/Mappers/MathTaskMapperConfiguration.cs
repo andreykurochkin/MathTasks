@@ -24,6 +24,7 @@ namespace MathTasks.Infrastructure.Mappers
 
             CreateMap<MathTask, MathTaskUpdateViewModel>();
 
+            // todo MathTaskUpdateViewModel seems to be obsolete
             CreateMap<MathTaskUpdateViewModel, MathTask>()
                 .ForMember(mathTask => mathTask.Id, option => option.Ignore())
                 .ForMember(mathTask => mathTask.Tags, option => option.Ignore())
@@ -36,6 +37,14 @@ namespace MathTasks.Infrastructure.Mappers
                 .ForMember(viewModel => viewModel.ReturnUrl, option => option.Ignore())
                 .ForMember(viewModel => viewModel.TotalTags, option => option.MapFrom<TotalTagsCustomResolver>())
                 .ForMember(viewModel => viewModel.Tags, option => option.MapFrom<TagsCustomResolver>());
+
+            CreateMap<MathTaskEditViewModel, MathTask>()
+                .ForMember(mathTask => mathTask.Id, option => option.Ignore())
+                .ForMember(mathTask => mathTask.Tags, option => option.Ignore())
+                .ForMember(mathTask => mathTask.CreatedAt, option => option.Ignore())
+                .ForMember(mathTask => mathTask.CreatedBy, option => option.Ignore())
+                .ForMember(mathTask => mathTask.UpdatedBy, option => option.Ignore())
+                .ForMember(mathTask => mathTask.UpdatedAt, option => option.Ignore());
         }
     }
 
