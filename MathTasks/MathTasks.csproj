@@ -47,6 +47,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MathTasks.Contracts\MathTasks.Contracts.csproj" />
     <ProjectReference Include="..\MathTasks.RazorLibrary\MathTasks.RazorLibrary.csproj" />
   </ItemGroup>
 

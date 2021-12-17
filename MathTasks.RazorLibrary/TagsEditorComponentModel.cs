@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using MathTasks.Contracts;
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
@@ -12,11 +13,16 @@ namespace MathTasks.RazorLibrary
     {
         [Parameter]
         public List<string>? Tags { get; set; }
+        
+        public List<string>? Found { get; set; }
+
+        public string TagName { get; set; } = string.Empty;
 
         [Inject] 
-        public IJSRuntime  JsRuntime { get; set; }
-        
-        //public int TotalTags => Tags?.Count ?? 0;
+        public IJSRuntime JsRuntime { get; set; }
+
+        [Inject]
+        public ISearchTagsService? SearchTagsService { get; set; }
 
         protected async Task DeleteTag(string tag)
         {
@@ -45,6 +51,39 @@ namespace MathTasks.RazorLibrary
                 return false;
             }
             return true;
+        }
+
+        protected void SearchTags(ChangeEventArgs e)
+        {
+            if (e?.Value is null)
+            {
+                Found = null;
+                return;
+            }
+            if (string.IsNullOrEmpty(e.Value.ToString()))
+            {
+                Found = null;
+                return;
+            }
+            Found = SearchTagsService!.SearchTags(e.Value.ToString()!);
+        }
+
+        protected async Task AddTag(string value)
+        {
+            var tag = value?.ToLower().Trim();
+            if (string.IsNullOrEmpty(tag))
+            {
+                return;
+            }
+            Tags ??= new List<string>();
+            if (!Tags.Exists(x=>x.Equals(tag, StringComparison.InvariantCulture)))
+            {
+                Tags.Add(tag);
+                // update TagsTotal value
+                await new RazorInterop(JsRuntime).SetTagsTotal(Tags.Count);
+            }
+            TagName = String.Empty;
+            Found = null;
         }
     }
 }

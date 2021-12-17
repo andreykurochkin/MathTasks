@@ -1,4 +1,5 @@
 ﻿using MathTasks.Controllers.AlterMathTasks.Queries;
+using MathTasks.Data;
 using MathTasks.Infrastructure.Services;
 using MathTasks.Models;
 using MathTasks.ViewModels;
@@ -17,11 +18,13 @@ namespace MathTasks.Controllers.AlterMathTasks
         private readonly IMediator _mediator;
         private readonly ITagService _tagService;
         private readonly IJSRuntime _jSRuntime;
+        private readonly ApplicationDbContext _context;
 
-        public AlterMathTasksController(IMediator mediator, ITagService tagService, IJSRuntime jSRuntime)
+        public AlterMathTasksController(IMediator mediator, ITagService tagService, IJSRuntime jSRuntime, ApplicationDbContext context)
         {
             (_mediator, _tagService) = (mediator, tagService);
             _jSRuntime = jSRuntime;
+            _context = context;
         }
 
         public async Task<IActionResult> Index(string tag)
@@ -54,9 +57,15 @@ namespace MathTasks.Controllers.AlterMathTasks
         }
 
         [HttpPost]
-        public IActionResult Edit(MathTaskEditViewModel model)
+        public async Task<IActionResult> Edit(MathTaskEditViewModel model)
         {
-            return (ModelState.IsValid) ? View(model) : View(model.ReturnUrl);
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+            _context.MathTasks
+            await _context.SaveChangesAsync();
+            return Redirect(model.ReturnUrl);
         }
     }
 }

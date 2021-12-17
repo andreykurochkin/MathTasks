@@ -3,16 +3,16 @@
 <div class="mb-3">
     <label asp-for="Tags"></label>
     <div>
-        @for(int i=0; i<Tags!.Count;i++)
+        @for (int i = 0; i < Tags!.Count; i++)
         {
-            <input name="Tags[@i]" value="@Tags[i]" type="hidden"/>
+            <input name="Tags[@i]" value="@Tags[i]" type="hidden" />
         }
     </div>
     <div class="row">
         <div class="col-md-8">
-            @if(Tags != null && Tags.Any())
+            @if (Tags != null && Tags.Any())
             {
-                foreach(var tag in Tags)
+                foreach (var tag in Tags)
                 {
                     <span class="btn btn-outline-secondary me-1 mb-1" @onclick="@(()=>DeleteTag(tag))">
                         @tag
@@ -21,6 +21,36 @@
                 }
             }
         </div>
-        <div class="col-md-3"></div>
+    </div>
+    <div class="col-4">
+        @if (Tags != null)
+        {
+            for (int i = 0; i < Tags.Count; i++)
+            {
+                <input name="Tags[@i]" value="@Tags[i]" type="hidden" />
+            }
+        }
+        <label for="_tag" class="form-label">Add tag</label>
+        <div class="input-group mb-3">
+            <input id="_tag"
+                   class="form-control"
+                   autocomplete="off" 
+                   @bind="TagName"
+                   @oninput="SearchTags"/>
+            <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="()=>AddTag(TagName)">+</button>
+        </div>
+        <div class="mb-3">
+            @if (Found != null && Found.Any())
+            {
+                foreach (var tag in Found)
+                {
+                    <div class="badge rounded-pill bg-info">
+                        <span style="cursor: pointer" @onclick="()=>AddTag(tag)">
+                            @tag
+                        </span>     
+                    </div>
+                }
+            }
+        </div>
     </div>
 </div>

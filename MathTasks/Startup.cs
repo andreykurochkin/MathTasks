@@ -15,6 +15,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using MediatR;
 using MathTasks.Infrastructure.Services;
+using MathTasks.Contracts;
 
 namespace MathTasks
 {
@@ -62,6 +63,7 @@ namespace MathTasks
 
             // dependency injection
             services.AddTransient<ITagService, TagService>();
+            services.AddTransient<ISearchTagsService, SearchTagsService>();
 
             services.AddServerSideBlazor();
         }
