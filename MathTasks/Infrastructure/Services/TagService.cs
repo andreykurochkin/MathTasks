@@ -48,7 +48,27 @@ namespace MathTasks.Infrastructure.Services
             ThrowIfParametersAreNotValid(tagNamesFromModel, mathTask);
             MutateParameters(mathTask);
             var (toCreate, toDelete) = FactHelper.FindItemsToCreateAndToDelete(GetTagNamesLinkedWithSpecificMathTask(mathTask.Id), tagNamesFromModel);
-            foreach (var tagName in toDelete)
+            await DeleteTags(mathTask, toDelete);
+            await AddNewTags(mathTask, toCreate);
+        }
+
+        private async Task AddNewTags(MathTask mathTask, IEnumerable<string>? toCreate)
+        {
+            foreach (var tagName in toCreate!)
+            {
+                var tag = await GetTagAsync(tagName);
+                if (tag is null)
+                {
+                    tag = new Tag() { Name = tagName.ToLower() };
+                    await _context!.Tags!.AddAsync(tag);
+                }
+                mathTask.Tags.Add(tag);
+            }
+        }
+
+        private async Task DeleteTags(MathTask mathTask, IEnumerable<string>? toDelete)
+        {
+            foreach (var tagName in toDelete!)
             {
                 var tag = await GetTagAsync(tagName);
                 if (tag is null)
@@ -61,16 +81,6 @@ namespace MathTasks.Infrastructure.Services
                     continue;
                 }
                 _context!.Tags!.Remove(tag);
-            }
-            foreach (var tagName in toCreate)
-            {
-                var tag = await GetTagAsync(tagName);
-                if (tag is null)
-                {
-                    tag = new Tag() { Name = tagName.ToLower() };
-                    await _context!.Tags!.AddAsync(tag);
-                }
-                mathTask.Tags.Add(tag);
             }
         }
 
