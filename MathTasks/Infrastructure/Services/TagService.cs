@@ -1,12 +1,17 @@
 ﻿using MathTasks.Controllers.AlterMathTasks.Queries;
 using MathTasks.Data;
+using MathTasks.Infrastructure.Helpers;
+using MathTasks.Models;
 using MathTasks.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MathTasks.Infrastructure.Services
@@ -15,12 +20,14 @@ namespace MathTasks.Infrastructure.Services
     {
         private readonly IMediator _mediatr;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ApplicationDbContext _context;
 
-        public TagService(IMediator mediatr, IHttpContextAccessor httpContextAccessor) => (_mediatr, _httpContextAccessor) = (mediatr, httpContextAccessor);
-        
+        public TagService(IMediator mediatr, IHttpContextAccessor httpContextAccessor, ApplicationDbContext context) =>
+            (_mediatr, _httpContextAccessor, _context) = (mediatr, httpContextAccessor, context);
+
         public async Task<IEnumerable<TagCloudViewModel>> GetCloudAsync()
         {
-            var viewModels = await _mediatr.Send(new GetTagCloudViewModelQuery(), _httpContextAccessor.HttpContext.RequestAborted);
+            var viewModels = await _mediatr.Send(new GetTagCloudViewModelQuery(), _httpContextAccessor!.HttpContext!.RequestAborted);
             var cluster = new Cluster<TagCloudViewModel>(options =>
                 {
                     options.OnMember = (t) => t.Total;
@@ -33,62 +40,76 @@ namespace MathTasks.Infrastructure.Services
 
             return clusterResult.Select(tuple => tuple.Item2);
         }
-    }
 
-    public class ClusterOptions<T>
-    {
-        /// <summary>
-        /// specifies property of T class which value is gonna be taken in order to build cluster
-        /// </summary>
-        public Func<T, int> OnMember { get; set; }
-
-        /// <summary>
-        /// specifies number of clusters gonna be processed
-        /// </summary>
-        public int UpperBoundOfClusters { get; set; }
-
-        public ClusterOptions(int upperBoundOfClusters = 10) { }
-    }
-
-    /// <summary>
-    /// Generates list of tuples, where tuple.Item1 is number of cluster, tuple.Item2 is instance of T
-    /// </summary>
-    public class Cluster<T>
-    {
-        private readonly ClusterOptions<T> _options = new();
-
-        public Cluster(Action<ClusterOptions<T>> configureOptions) => configureOptions(_options);
-
-        public List<Tuple<int, T>> ToList(IEnumerable<T> items) => 
-            CreateClusters(items)
-                .SelectMany((ListOfT, @IndexOfCluster) => ListOfT.Select(t => new Tuple<int, T>(IndexOfCluster, t)))
-                .ToList();
-
-        private List<List<T>> CreateClusters(IEnumerable<T> items)
+        public async Task UpdateTagsInDatabaseAsync(IEnumerable<string> tagNamesFromModel,
+                                                    MathTask mathTask,
+                                                    CancellationToken cancellationToken)
         {
-            var clusters = new List<List<T>>();
-            var orderedItems = items.OrderBy(_options.OnMember).ToList();
-            if (orderedItems.Any())
+            ThrowIfParametersAreNotValid(tagNamesFromModel, mathTask);
+            MutateParameters(mathTask);
+            var (toCreate, toDelete) = FactHelper.FindItemsToCreateAndToDelete(GetTagNamesLinkedWithSpecificMathTask(mathTask.Id), tagNamesFromModel);
+            foreach (var tagName in toDelete)
             {
-                var min = orderedItems.Min(_options.OnMember);
-                var max = orderedItems.Max(_options.OnMember) + min;
-                var completeRange = max - min;
-                var groupRange = completeRange / (double)_options.UpperBoundOfClusters;
-                var cluster = new List<T>();
-                var currentRange = min + groupRange;
-                for (int i = 0; i < orderedItems.Count; i++)
+                var tag = await GetTagAsync(tagName);
+                if (tag is null)
                 {
-                    while (_options.OnMember(orderedItems.ToArray()[i]) > currentRange)
-                    {
-                        clusters.Add(cluster);
-                        cluster = new List<T>();
-                        currentRange += groupRange;
-                    }
-                    cluster.Add(orderedItems.ToArray()[i]);
+                    continue;
                 }
-                clusters.Add(cluster);
+                mathTask.Tags.Remove(tag);
+                if (!IsToDeleteFromTable(tagName))
+                {
+                    continue;
+                }
+                _context!.Tags!.Remove(tag);
             }
-            return clusters;
+            foreach (var tagName in toCreate)
+            {
+                var tag = await GetTagAsync(tagName);
+                if (tag is null)
+                {
+                    tag = new Tag() { Name = tagName.ToLower() };
+                    await _context!.Tags!.AddAsync(tag);
+                }
+                mathTask.Tags.Add(tag);
+            }
         }
+
+        private bool IsToDeleteFromTable(string tagName) => CountTagsInDatabase(tagName) == 1;
+
+        private int CountTagsInDatabase(string tagName) =>
+            _context!.MathTasks!
+                .Where(m => m.Tags.Select(t => t.Name).Contains(tagName))
+                .Count();
+
+
+        private Task<Tag?> GetTagAsync(string tagName) => 
+            _context!.Tags!
+                .FirstOrDefaultAsync(predicate: t => t.Name.ToLower() == tagName);
+
+        private void ThrowIfParametersAreNotValid(IEnumerable<string> tagNamesFromModel,
+                                                  MathTask mathTask)
+        {
+            if (tagNamesFromModel is null)
+            {
+                throw new ArgumentNullException(nameof(tagNamesFromModel));
+            }
+            if (mathTask is null)
+            {
+                throw new ArgumentException(nameof(mathTask));
+            }
+        }
+
+        private Func<Tag, Guid, bool> TagIsLinkedToToSpecificMathTask = (tag, mathTaskGuid) =>
+            tag!.MathTasks!
+                .Select(m => m.Id).Contains(mathTaskGuid);
+
+        private IEnumerable<string> GetTagNamesLinkedWithSpecificMathTask(Guid mathTaskId) =>
+            _context!.Tags!
+                .Where(t => t!.MathTasks!.Select(m => m.Id).Contains(mathTaskId))
+                .Select(t => t.Name.ToLower());
+
+        private void MutateParameters(MathTask mathTask) =>
+            mathTask.Tags ??= new Collection<Tag>();
+
     }
 }

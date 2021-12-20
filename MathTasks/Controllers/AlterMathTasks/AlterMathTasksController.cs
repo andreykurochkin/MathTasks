@@ -1,4 +1,6 @@
-﻿using MathTasks.Controllers.AlterMathTasks.Queries;
+﻿using AutoMapper;
+using MathTasks.Controllers.AlterMathTasks.Commands;
+using MathTasks.Controllers.AlterMathTasks.Queries;
 using MathTasks.Data;
 using MathTasks.Infrastructure.Services;
 using MathTasks.Models;
@@ -19,12 +21,18 @@ namespace MathTasks.Controllers.AlterMathTasks
         private readonly ITagService _tagService;
         private readonly IJSRuntime _jSRuntime;
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public AlterMathTasksController(IMediator mediator, ITagService tagService, IJSRuntime jSRuntime, ApplicationDbContext context)
+        public AlterMathTasksController(IMediator mediator,
+                                        ITagService tagService,
+                                        IJSRuntime jSRuntime,
+                                        ApplicationDbContext context,
+                                        IMapper mapper)
         {
             (_mediator, _tagService) = (mediator, tagService);
             _jSRuntime = jSRuntime;
             _context = context;
+            _mapper = mapper;
         }
 
         public async Task<IActionResult> Index(string tag)
@@ -59,13 +67,15 @@ namespace MathTasks.Controllers.AlterMathTasks
         [HttpPost]
         public async Task<IActionResult> Edit(MathTaskEditViewModel model)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                return View(model);
+                var result = await _mediator.Send(new UpdateMathTaskCommand(model));
+                if (result is not null)
+                {
+                    return Redirect(model.ReturnUrl);
+                }
             }
-            _context.MathTasks
-            await _context.SaveChangesAsync();
-            return Redirect(model.ReturnUrl);
+            return View(model);
         }
     }
 }
