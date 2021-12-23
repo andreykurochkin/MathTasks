@@ -15,5 +15,6 @@ namespace MathTasks.Data
         public DbSet<MathTask>? MathTasks { get; set; }
         public DbSet<Tag>? Tags { get; set; }
         public DbSet<Notification>? Notifications { get; set; }
+        public object Inser { get; internal set; }
     }
 }

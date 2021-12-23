@@ -2,6 +2,8 @@ using MathTasks.Infrastructure.Mappers.Base;
 using Xunit;
 using FluentAssertions;
 using AutoMapper;
+using MathTasks.Models;
+using MathTasks.ViewModels;
 
 namespace MathTasks.Tests
 {
@@ -13,10 +15,12 @@ namespace MathTasks.Tests
         }
 
         private readonly MapperRegistrationDongle _sut;
+        private readonly IMapper _mapper;
 
-        public AutomapperTests()
+        public AutomapperTests(IMapper mapper)
         {
             _sut = new MapperRegistrationDongle();
+            _mapper = mapper;
         }
 
         [Fact]
@@ -35,6 +39,17 @@ namespace MathTasks.Tests
             var result = _sut.GetMapperConfiguration();
 
             result.AssertConfigurationIsValid();
+        }
+
+        [Fact]
+        [Trait("Automapper", "Mapper behavior")]
+        public void Map_ShouldReturnNull_WhenInputIsNull()
+        {
+            MathTask entity = null!;
+            
+            var result = _mapper.Map<MathTaskViewModel>(entity);
+
+            result.Should().BeNull();
         }
     }
 }

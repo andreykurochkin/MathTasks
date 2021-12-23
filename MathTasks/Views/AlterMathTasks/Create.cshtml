@@ -1,0 +1,77 @@
+﻿@using MathTasks.RazorLibrary
+@model MathTasks.ViewModels.MathTaskCreateViewModel
+@{
+    ViewData["Title"] = "New math task";
+}
+
+<div class="row">
+    <div class="col">
+        @if (Model is not null)
+        {
+            <form id="fact-editor"
+              asp-action="Create"
+              asp-controller="AlterMathTasks"
+              method="post"
+              asp-antiforgery="true">
+                <input type="hidden" asp-for="TotalTags" value="@Model!.Tags?.Count()" />
+
+                @if (ViewData["Error"] != null)
+                {
+                    <div class="alert alert-danger">
+                        @ViewData["Error"]
+                    </div>
+
+                }
+
+                <div class="mb-3">
+                    <label asp-for="Theme" class="form-label">
+                        <div>
+                            <textarea asp-for="Theme" class="form-control" rows="6"></textarea>
+                            <span asp-validation-for="Theme" class="text-danger"></span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Content" class="form-label">
+                        <div>
+                            <textarea asp-for="Content" class="form-control" rows="6"></textarea>
+                            <span asp-validation-for="Content" class="text-danger"></span>
+                        </div>
+                    </label>
+                </div>
+
+                @if (Model.Tags != null)
+                {
+                    <label asp-for="TotalTags"></label>
+                    <component type="typeof(TagsEditorComponent)"
+                       render-mode=ServerPrerendered
+                       param-Tags="@Model.Tags" />
+                    <br />
+                    <span asp-validation-for="TotalTags" class="text-danger"></span>
+                }
+
+                <div class="my-5">
+                    <button type="submit" class="btn btn-outline-primary">Save</button>
+                </div>
+                <div asp-validation-summary="All" class="text-danger"></div>
+            </form>
+        }
+    </div>
+</div>
+
+
+@section Headers
+{
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet" />
+}
+
+@section Scripts
+{
+<script src="_framework/blazor.server.js"></script>
+<script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+<script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script src="~/js/custom.validation.js"></script>
+<script src="~/js~/js/custom.validation.js"></script>
+}

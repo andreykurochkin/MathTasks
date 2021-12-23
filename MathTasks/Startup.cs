@@ -16,6 +16,9 @@ using System.Threading.Tasks;
 using MediatR;
 using MathTasks.Infrastructure.Services;
 using MathTasks.Contracts;
+using Kurochkin.Persistene.UnitOfWork;
+using MathTasks.Models;
+using MathTasks.Persistent.Repositories;
 
 namespace MathTasks
 {
@@ -64,6 +67,7 @@ namespace MathTasks
             // dependency injection
             services.AddTransient<ITagService, TagService>();
             services.AddTransient<ISearchTagsService, SearchTagsService>();
+            services.AddTransient<IRepository<MathTask,Guid>>(x=>ActivatorUtilities.CreateInstance<MathTaskRepository>(x, options => options.));
 
             services.AddServerSideBlazor();
         }

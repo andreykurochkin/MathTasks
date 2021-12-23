@@ -44,7 +44,7 @@ namespace MathTasks.Controllers.AlterMathTasks
         }
 
         public async Task<IActionResult> Show(Guid id) =>
-            View(await _mediator.Send(new GetMathTaskViewModelByIdQuery { Id = id }, HttpContext.RequestAborted));
+            View(await _mediator.Send(new MathTaskGetByIdQuery(id), HttpContext.RequestAborted));
 
         public IActionResult Cloud() => View();
 
@@ -76,6 +76,28 @@ namespace MathTasks.Controllers.AlterMathTasks
                 }
             }
             return View(model);
+        }
+
+        [HttpGet]
+        public IActionResult Create()
+        {
+            var viewModel = new MathTaskCreateViewModel();
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(MathTaskCreateViewModel viewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _mediator.Send(new CreateMathTaskCommand(viewModel));
+                if (result is not null)
+                {
+                    return RedirectToAction("Index", "AlterMathTasks");
+                }
+                ModelState.AddModelError("", "error on create new math task operation");
+            }
+            return View(viewModel);
         }
     }
 }

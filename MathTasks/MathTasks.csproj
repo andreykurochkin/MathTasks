@@ -34,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Persistent\" />
     <Folder Include="wwwroot\css\" />
     <Folder Include="wwwroot\images\" />
     <Folder Include="wwwroot\lib\bootstrap\" />
@@ -46,6 +47,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Kurohkin.UnitOfWork\Kurochkin.Persistene.UnitOfWork.csproj" />
     <ProjectReference Include="..\MathTasks.Contracts\MathTasks.Contracts.csproj" />
     <ProjectReference Include="..\MathTasks.RazorLibrary\MathTasks.RazorLibrary.csproj" />
   </ItemGroup>
