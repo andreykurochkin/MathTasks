@@ -67,7 +67,6 @@ namespace MathTasks
             // dependency injection
             services.AddTransient<ITagService, TagService>();
             services.AddTransient<ISearchTagsService, SearchTagsService>();
-            services.AddTransient<IRepository<MathTask,Guid>>(x=>ActivatorUtilities.CreateInstance<MathTaskRepository>(x, options => options.));
 
             services.AddServerSideBlazor();
         }

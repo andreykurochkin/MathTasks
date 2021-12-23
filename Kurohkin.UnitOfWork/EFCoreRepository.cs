@@ -4,16 +4,27 @@ using System.Linq.Expressions;
 using System.Linq;
 
 namespace Kurochkin.Persistene.UnitOfWork;
+
+
 public class EFCoreRepository<TEntity, TGuid> : IRepository<TEntity, TGuid> where TEntity : class where TGuid : struct
 {
     protected DbContext DbContext { get; }
     protected DbSet<TEntity> DbSet { get; }
+    public EFCoreRepositoryConfigureOptions<TEntity, TGuid> Options { get; } = new();
 
-    public EFCoreRepository(DbContext dbContext)
+    public EFCoreRepository(DbContext dbContext, Action<EFCoreRepositoryConfigureOptions<TEntity,TGuid>> configure)
     {
         DbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
-        DbSet = dbContext.Set<TEntity>();
+        DbSet = dbContext.Set<TEntity>() ?? throw new ArgumentNullException(nameof(TEntity));
+        configure?.Invoke(Options);
     }
+
+    public Task<TEntity?> Get(TGuid id) => GetFirstOrDefaultAsync<TEntity>(predicate: Options.Predicate,
+                                               orderyBy: Options.OrderyBy,
+                                               include: Options.Include,
+                                               disableTracking: Options.DisableTracking);
+
+    //------------------------------------------------------
 
     public void Add(TEntity entity)
     {
@@ -30,10 +41,7 @@ public class EFCoreRepository<TEntity, TGuid> : IRepository<TEntity, TGuid> wher
         throw new NotImplementedException();
     }
 
-    public Task<TEntity> Get(TGuid id)
-    {
-        throw new NotImplementedException();
-    }
+    
 
     public IEnumerable<TEntity> GetAll()
     {
@@ -50,7 +58,7 @@ public class EFCoreRepository<TEntity, TGuid> : IRepository<TEntity, TGuid> wher
         throw new NotImplementedException();
     }
 
-    public Task<TEntity> GetFirstOrDefaultAsync<TResult>(Expression<Func<TEntity, bool>> predicate = null,
+    protected Task<TEntity?> GetFirstOrDefaultAsync<TResult>(Expression<Func<TEntity, bool>> predicate = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderyBy = null,
         Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
         bool disableTracking = true)
@@ -74,7 +82,7 @@ public class EFCoreRepository<TEntity, TGuid> : IRepository<TEntity, TGuid> wher
 
     }
 
-    public virtual async Task<TResult> GetFirstOrDefaultAsync<TResult>(Expression<Func<TEntity, TResult>> selector,
+    public virtual async Task<TResult?> GetFirstOrDefaultAsync<TResult>(Expression<Func<TEntity, TResult>> selector,
         Expression<Func<TEntity, bool>> predicate = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderyBy = null,
         Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
@@ -93,7 +101,7 @@ public class EFCoreRepository<TEntity, TGuid> : IRepository<TEntity, TGuid> wher
         {
             query = query.Where(predicate);
         }
-        return orderyBy is null
+        return (orderyBy is null)
             ? await query.Select(selector).FirstOrDefaultAsync()
             : await orderyBy(query).Select(selector).FirstOrDefaultAsync();
 
