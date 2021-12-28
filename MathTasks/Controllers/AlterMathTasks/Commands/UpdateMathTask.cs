@@ -1,15 +1,17 @@
-﻿using MathTasks.Controllers.AlterMathTasks.Commands;
+﻿using AutoMapper;
 using MathTasks.Data;
-using MathTasks.Models;
-using MediatR;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using System;
-using AutoMapper;
 using MathTasks.Infrastructure.Services;
+using MathTasks.Models;
+using MathTasks.ViewModels;
+using MediatR;
+using System.Threading.Tasks;
+using System.Threading;
+using System;
+using Microsoft.EntityFrameworkCore;
 
-namespace MathTasks.Controllers.AlterMathTasks.Handlers;
+namespace MathTasks.Controllers.AlterMathTasks.Commands;
+
+public record UpdateMathTaskCommand(MathTaskEditViewModel mathTaskEditViewModel) : IRequest<MathTask>;
 
 public class UpdateMathTaskHandler : IRequestHandler<UpdateMathTaskCommand, MathTask>
 {
@@ -29,7 +31,7 @@ public class UpdateMathTaskHandler : IRequestHandler<UpdateMathTaskCommand, Math
             .FirstOrDefaultAsync(x => x.Id.Equals(request.mathTaskEditViewModel.Id));
         if (entity is null)
         {
-            return null;
+            return null!;
         }
         _mapper.Map(request.mathTaskEditViewModel, entity);
         _context.Update(entity);

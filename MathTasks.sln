@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MathTasks.RazorLibrary", "M
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MathTasks.Contracts", "MathTasks.Contracts\MathTasks.Contracts.csproj", "{4AA415DA-66E1-4DEF-9244-B9DCBD811184}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kurochkin.Persistene.UnitOfWork", "Kurohkin.UnitOfWork\Kurochkin.Persistene.UnitOfWork.csproj", "{DBA4040D-0AED-430D-8D8B-CF2654F1CCD8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Kurochkin.Persistence.UnitOfWork", "Kurohkin.UnitOfWork\Kurochkin.Persistence.UnitOfWork.csproj", "{DBA4040D-0AED-430D-8D8B-CF2654F1CCD8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

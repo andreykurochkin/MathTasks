@@ -1,15 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
-namespace Kurochkin.Persistene.UnitOfWork;
+namespace Kurochkin.Persistence.UnitOfWork;
 
-public class EFCoreRepositoryConfigureOptions<TEntity, TGuid> where TEntity : class where TGuid : struct
+public class EFCoreRepositoryConfigureOptions<TEntity, TGuid> : IEFCoreRepositoryConfigureOptions<TEntity, TGuid> where TEntity : class where TGuid : struct
 {
-    public Expression<Func<TEntity, bool>> Predicate { get; set; } = null!;
-    
-    public Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> OrderyBy { get; set; } = null!;
-    
-    public Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> Include {get;set;} = null!;
+    // todo delete class
+    // I use specific classes in MathTask project Persistent folder instead of that POCO
+    public EFCoreRepositoryConfigureOptions()
+    {
 
-    public bool DisableTracking { get; set; } = true;
+    }
+    public Expression<Func<TEntity, bool>>? Predicate { get ; set; }
+    public Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? OrderyBy { get; set; }
+    public Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? Include { get; set; }
+    public bool DisableTracking { get; set; }
+    public TGuid SearchId { get; set; }
 }

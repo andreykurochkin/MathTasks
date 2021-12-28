@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using MathTasks.Controllers.AlterMathTasks.Queries;
 using MathTasks.Data;
 using MathTasks.ViewModels;
 using MediatR;
@@ -8,7 +7,10 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MathTasks.Controllers.AlterMathTasks.Handlers;
+namespace MathTasks.Controllers.AlterMathTasks.Queries;
+
+public record GetTagCloudViewModelQuery : IRequest<IEnumerable<TagCloudViewModel>>;
+
 public class GetTagCloudViewModelQueryHandler : IRequestHandler<GetTagCloudViewModelQuery, IEnumerable<TagCloudViewModel>>
 {
     private readonly ApplicationDbContext _context;
@@ -18,7 +20,7 @@ public class GetTagCloudViewModelQueryHandler : IRequestHandler<GetTagCloudViewM
 
     public async Task<IEnumerable<TagCloudViewModel>> Handle(GetTagCloudViewModelQuery request, CancellationToken cancellationToken)
     {
-        var dbItems = await _context.Tags.Include(t => t.MathTasks).ToListAsync();
+        var dbItems = await _context.Tags!.Include(t => t.MathTasks).ToListAsync();
         var mappedItems = _mapper.Map<IEnumerable<TagCloudViewModel>>(dbItems);
         return mappedItems;
     }

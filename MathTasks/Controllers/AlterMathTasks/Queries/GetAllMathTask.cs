@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Calabonga.PredicatesBuilder;
-using MathTasks.Controllers.AlterMathTasks.Queries;
 using MathTasks.Data;
 using MathTasks.Models;
 using MathTasks.ViewModels;
@@ -13,8 +12,14 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MathTasks.Controllers.AlterMathTasks.Handlers
+namespace MathTasks.Controllers.AlterMathTasks.Queries
 {
+    public record GetMathTaskViewModelsQuery : IRequest<IEnumerable<MathTaskViewModel>>
+    {
+        public string? Tag { get; init; }
+        public string? Search { get; init; }
+    };
+
     public class GetMathTaskViewModelsQueryHandler : IRequestHandler<GetMathTaskViewModelsQuery, IEnumerable<MathTaskViewModel>>
     {
         private readonly IMapper _mapper;
@@ -27,15 +32,18 @@ namespace MathTasks.Controllers.AlterMathTasks.Handlers
         }
         public async Task<IEnumerable<MathTaskViewModel>> Handle(GetMathTaskViewModelsQuery request, CancellationToken cancellationToken)
         {
+            // todo fix
             var predicate = CreatePredicate(request);
 
-            var dbItems = await _context.MathTasks.Include(mathTask => mathTask.Tags).Where(predicate).ToListAsync();
+            var dbItems = await _context!.MathTasks!.Include(mathTask => mathTask.Tags).Where(predicate).ToListAsync();
             var mappedItems = _mapper.Map<IEnumerable<MathTaskViewModel>>(dbItems);
             return mappedItems;
+            //throw new NotImplementedException();
         }
 
         private Expression<Func<MathTask, bool>> CreatePredicate(GetMathTaskViewModelsQuery request)
         {
+            // todo fix
             var predicate = PredicateBuilder.True<MathTask>();
             if (!string.IsNullOrWhiteSpace(request.Search))
             {
@@ -43,9 +51,10 @@ namespace MathTasks.Controllers.AlterMathTasks.Handlers
             }
             if (!string.IsNullOrWhiteSpace(request.Tag))
             {
-                predicate = predicate.And(x => x.Tags.Select(tag => tag.Name).Contains(request.Tag));
+                predicate = predicate.And(x => x.Tags!.Select(tag => tag.Name).Contains(request.Tag));
             }
             return predicate;
+            //throw new NotImplementedException();
         }
     }
 }

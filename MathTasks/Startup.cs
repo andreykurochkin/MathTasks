@@ -16,9 +16,9 @@ using System.Threading.Tasks;
 using MediatR;
 using MathTasks.Infrastructure.Services;
 using MathTasks.Contracts;
-using Kurochkin.Persistene.UnitOfWork;
 using MathTasks.Models;
 using MathTasks.Persistent.Repositories;
+using Kurochkin.Persistence.UnitOfWork;
 
 namespace MathTasks
 {
@@ -40,6 +40,7 @@ namespace MathTasks
                 options.LowercaseQueryStrings = true;
             });
 
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
@@ -57,7 +58,6 @@ namespace MathTasks
 
             //MapperRegistration.GetMapperConfiguration();
             services.AddAutoMapper(typeof(Startup).Assembly);
-
             services.AddMediatR(typeof(Startup));
 
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
@@ -68,7 +68,19 @@ namespace MathTasks
             services.AddTransient<ITagService, TagService>();
             services.AddTransient<ISearchTagsService, SearchTagsService>();
 
+            services.AddScoped<DbContext, ApplicationDbContext>();
+            services.AddTransient<IRepository<MathTask, Guid>, EFCoreRepository<MathTask, Guid>>();
+            
+            //services.AddScoped(typeof(IEFCoreRepositoryConfigureOptions<,>), typeof(EFCoreRepositoryConfigureOptions<,>));
+            services.AddScoped(typeof(IEFCoreRepositoryConfigureOptions<MathTask,Guid>), typeof(MathTaskRepositoryConfigureOptions));
+
             services.AddServerSideBlazor();
+
+        }
+
+        private void MathTaskRepository()
+        {
+            throw new NotImplementedException();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

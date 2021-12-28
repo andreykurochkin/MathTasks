@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Kurochkin.Persistene.UnitOfWork;
+namespace Kurochkin.Persistence.UnitOfWork;
 
 public interface IRepository<TEntity, TGuid>
     where TEntity : class
@@ -17,7 +13,7 @@ public interface IRepository<TEntity, TGuid>
 
     // Read
     Task<TEntity?> Get(TGuid id);
-    IEnumerable<TEntity> GetAll();
+    Task<IEnumerable<TEntity>> GetAll();
     IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> prediate);
 
     // Delete

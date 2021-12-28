@@ -1,32 +1,28 @@
 ﻿using AutoMapper;
-using MathTasks.Data;
+using Kurochkin.Persistence.UnitOfWork;
 using MathTasks.Models;
 using MathTasks.ViewModels;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MathTasks.Controllers.AlterMathTasks.Queries
+namespace MathTasks.Controllers.AlterMathTasks.Queries;
+
+public record MathTaskGetByIdQuery(Guid Id) : IRequest<MathTaskViewModel>;
+
+public class MathTaskGetByIdHandler : IRequestHandler<MathTaskGetByIdQuery, MathTaskViewModel>
 {
-    public record MathTaskGetByIdQuery(Guid Id) : IRequest<MathTaskViewModel>;
+    private readonly IMapper _mapper;
+    private readonly IRepository<MathTask, Guid> _repository;
 
-    public class MathTaskGetByIdHandler : IRequestHandler<MathTaskGetByIdQuery, MathTaskViewModel>
+    public MathTaskGetByIdHandler(IMapper mapper, IRepository<MathTask, Guid> repository) 
+        => (_mapper, _repository) = (mapper, repository);
+
+    public async Task<MathTaskViewModel> Handle(MathTaskGetByIdQuery request, CancellationToken cancellationToken)
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IMapper _mapper;
-
-        public MathTaskGetByIdHandler(ApplicationDbContext context, IMapper mapper)
-        {
-            _context = context;
-            _mapper = mapper;
-        }
-        public async Task<MathTaskViewModel> Handle(MathTaskGetByIdQuery request, CancellationToken cancellationToken)
-        {
-            var entity = await _context!.MathTasks!.Include(_ => _.Tags).FirstOrDefaultAsync(x => x.Id == request.Id);
-            var mappedItem = _mapper.Map<MathTaskViewModel>(entity);
-            return mappedItem;
-        }
+        var entity = await _repository.Get(request.Id);
+        var viewModel = _mapper.Map<MathTaskViewModel>(entity);
+        return viewModel;
     }
 }
