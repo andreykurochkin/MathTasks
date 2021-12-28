@@ -7,10 +7,6 @@ public class EFCoreRepositoryConfigureOptions<TEntity, TGuid> : IEFCoreRepositor
 {
     // todo delete class
     // I use specific classes in MathTask project Persistent folder instead of that POCO
-    public EFCoreRepositoryConfigureOptions()
-    {
-
-    }
     public Expression<Func<TEntity, bool>>? Predicate { get ; set; }
     public Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? OrderyBy { get; set; }
     public Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? Include { get; set; }

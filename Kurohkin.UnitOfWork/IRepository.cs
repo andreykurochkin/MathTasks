@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Query;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
 namespace Kurochkin.Persistence.UnitOfWork;
 
@@ -13,7 +12,7 @@ public interface IRepository<TEntity, TGuid>
 
     // Read
     Task<TEntity?> Get(TGuid id);
-    Task<IEnumerable<TEntity>> GetAll();
+    Task<IEnumerable<TEntity>> GetAll(Expression<Func<TEntity, bool>> prediate = null!);
     IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> prediate);
 
     // Delete
