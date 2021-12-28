@@ -73,6 +73,7 @@ namespace MathTasks
             
             //services.AddScoped(typeof(IEFCoreRepositoryConfigureOptions<,>), typeof(EFCoreRepositoryConfigureOptions<,>));
             services.AddScoped(typeof(IEFCoreRepositoryConfigureOptions<MathTask,Guid>), typeof(MathTaskRepositoryConfigureOptions));
+            services.AddScoped(typeof(IRepository<MathTask,Guid>), typeof(MathTaskRepository));
 
             services.AddServerSideBlazor();
 

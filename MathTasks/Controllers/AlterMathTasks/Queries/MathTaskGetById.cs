@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Kurochkin.Persistence.UnitOfWork;
 using MathTasks.Models;
+using MathTasks.Persistent.Repositories;
 using MathTasks.ViewModels;
 using MediatR;
 using System;
@@ -15,8 +16,10 @@ public class MathTaskGetByIdHandler : IRequestHandler<MathTaskGetByIdQuery, Math
 {
     private readonly IMapper _mapper;
     private readonly IRepository<MathTask, Guid> _repository;
+    //private readonly MathTaskRepository _repository;
 
-    public MathTaskGetByIdHandler(IMapper mapper, IRepository<MathTask, Guid> repository) 
+    public MathTaskGetByIdHandler(IMapper mapper, IRepository<MathTask, Guid> repository)
+    //public MathTaskGetByIdHandler(IMapper mapper, MathTaskRepository repository)
         => (_mapper, _repository) = (mapper, repository);
 
     public async Task<MathTaskViewModel> Handle(MathTaskGetByIdQuery request, CancellationToken cancellationToken)

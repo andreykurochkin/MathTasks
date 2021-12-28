@@ -15,7 +15,7 @@ public class EFCoreRepository<TEntity, TGuid> : IRepository<TEntity, TGuid> wher
     {
         DbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         DbSet = dbContext.Set<TEntity>() ?? throw new ArgumentNullException(nameof(TEntity));
-        Options = options ?? throw new ArgumentNullException(nameof(TEntity));
+        Options = options /*?? throw new ArgumentNullException(nameof(TEntity))*/;
     }
 
     public virtual Task<TEntity?> Get(TGuid id)
@@ -110,7 +110,7 @@ public class EFCoreRepository<TEntity, TGuid> : IRepository<TEntity, TGuid> wher
         throw new NotImplementedException();
     }
 
-    protected Task<TEntity> AlterGetFirstOrDefaultAsync<TResult>(Expression<Func<TEntity, bool>> predicate = null,
+    protected Task<TEntity?> AlterGetFirstOrDefaultAsync<TResult>(Expression<Func<TEntity, bool>> predicate = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderyBy = null,
         Expression<Func<TEntity, object>> include = null,
         bool disableTracking = true)
