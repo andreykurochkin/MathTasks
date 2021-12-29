@@ -60,14 +60,6 @@ namespace MathTasks.Tests
         [Fact]
         public void Randomizer_ShouldReturnRandomSubsetOfItems_WhenDataIsValid()
         {
-            //var localTags = Enumerable.Range(0, 10).Select(i=>CreateTag()).ToList();
-
-            //var collectionizer = new Collectionizer<Tag, TagsRandomizer>(new TagsRandomizer { Tags = localTags }, (uint)1, (uint)localTags.Count);
-
-            //_testOutputHelper.WriteLine(string.Join(",", localTags.Select(tag=>tag.Name)));
-            //_testOutputHelper.WriteLine(string.Join(",", collectionizer.GetValue().Select(tag => tag.Name).ToList()));
-
-
             int elementsCount = 10;
             var list = Enumerable.Range(0, elementsCount).ToList();
             _testOutputHelper.WriteLine(string.Join(",", list.Select(i => i.ToString())));
