@@ -71,8 +71,6 @@ namespace MathTasks
             services.AddScoped<DbContext, ApplicationDbContext>();
             services.AddTransient<IRepository<MathTask, Guid>, EFCoreRepository<MathTask, Guid>>();
             
-            //services.AddScoped(typeof(IEFCoreRepositoryConfigureOptions<,>), typeof(EFCoreRepositoryConfigureOptions<,>));
-            services.AddScoped(typeof(IEFCoreRepositoryConfigureOptions<MathTask,Guid>), typeof(MathTaskRepositoryConfigureOptions));
             services.AddScoped(typeof(IRepository<MathTask,Guid>), typeof(MathTaskRepository));
 
             services.AddServerSideBlazor();

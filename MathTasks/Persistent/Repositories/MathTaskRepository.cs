@@ -1,10 +1,9 @@
 ﻿using Kurochkin.Persistence.UnitOfWork;
 using MathTasks.Data;
 using MathTasks.Models;
-using Microsoft.EntityFrameworkCore;
+using MathTasks.Persistent.Specifications;
 using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace MathTasks.Persistent.Repositories;

@@ -9,13 +9,11 @@ public class EFCoreRepository<TEntity, TGuid> : IRepository<TEntity, TGuid> wher
     protected TGuid Guid { get; set; }
     protected DbContext DbContext { get; }
     protected DbSet<TEntity> DbSet { get; }
-    protected IEFCoreRepositoryConfigureOptions<TEntity, TGuid>? Options { get; }
 
-    public EFCoreRepository(DbContext dbContext, IEFCoreRepositoryConfigureOptions<TEntity, TGuid>? options = null!)
+    public EFCoreRepository(DbContext dbContext)
     {
         DbContext = dbContext ?? throw new ArgumentNullException(nameof(dbContext));
         DbSet = dbContext.Set<TEntity>() ?? throw new ArgumentNullException(nameof(TEntity));
-        Options = options /*?? throw new ArgumentNullException(nameof(TEntity))*/;
     }
 
     public virtual Task<TEntity?> Get(TGuid id) => throw new NotImplementedException("Implementation should be inside derived specific class");
