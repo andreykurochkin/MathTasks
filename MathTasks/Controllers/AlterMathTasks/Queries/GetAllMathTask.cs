@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Calabonga.PredicatesBuilder;
+using Kurochkin.Persistence.UnitOfWork;
 using MathTasks.Data;
 using MathTasks.Models;
 using MathTasks.ViewModels;
@@ -14,47 +15,20 @@ using System.Threading.Tasks;
 
 namespace MathTasks.Controllers.AlterMathTasks.Queries
 {
-    public record GetMathTaskViewModelsQuery : IRequest<IEnumerable<MathTaskViewModel>>
-    {
-        public string? Tag { get; init; }
-        public string? Search { get; init; }
-    };
+    public record GetMathTaskViewModelsQuery(string Tag, string Search) : IRequest<IEnumerable<MathTaskViewModel>>;
 
     public class GetMathTaskViewModelsQueryHandler : IRequestHandler<GetMathTaskViewModelsQuery, IEnumerable<MathTaskViewModel>>
     {
         private readonly IMapper _mapper;
-        private readonly ApplicationDbContext _context;
+        private readonly IRepository<MathTask, Guid> _repository;
 
-        public GetMathTaskViewModelsQueryHandler(IMapper mapper, ApplicationDbContext context)
-        {
-            _mapper = mapper;
-            _context = context;
-        }
+        public GetMathTaskViewModelsQueryHandler(IMapper mapper, IRepository<MathTask, Guid> repository) => (_mapper, _repository) = (mapper, repository);
+
         public async Task<IEnumerable<MathTaskViewModel>> Handle(GetMathTaskViewModelsQuery request, CancellationToken cancellationToken)
         {
-            // todo fix
-            var predicate = CreatePredicate(request);
-
-            var dbItems = await _context!.MathTasks!.Include(mathTask => mathTask.Tags).Where(predicate).ToListAsync();
+            var dbItems = await _repository.GetAll(request.Tag, request.Search);
             var mappedItems = _mapper.Map<IEnumerable<MathTaskViewModel>>(dbItems);
             return mappedItems;
-            //throw new NotImplementedException();
-        }
-
-        private Expression<Func<MathTask, bool>> CreatePredicate(GetMathTaskViewModelsQuery request)
-        {
-            // todo fix
-            var predicate = PredicateBuilder.True<MathTask>();
-            if (!string.IsNullOrWhiteSpace(request.Search))
-            {
-                predicate = predicate.And(x => x.Content.Contains(request.Search));
-            }
-            if (!string.IsNullOrWhiteSpace(request.Tag))
-            {
-                predicate = predicate.And(x => x.Tags!.Select(tag => tag.Name).Contains(request.Tag));
-            }
-            return predicate;
-            //throw new NotImplementedException();
         }
     }
 }

@@ -38,7 +38,7 @@ namespace MathTasks.Controllers.AlterMathTasks
         public async Task<IActionResult> Index(string tag)
         {
             ViewData["tag"] = tag;
-            var query = new GetMathTaskViewModelsQuery { Tag = tag };
+            var query = new GetMathTaskViewModelsQuery(tag,string.Empty);/* { Tag = tag };*/
             var viewModels = await _mediator.Send(query, HttpContext.RequestAborted);
             return View(viewModels);
         }

@@ -18,48 +18,10 @@ public class EFCoreRepository<TEntity, TGuid> : IRepository<TEntity, TGuid> wher
         Options = options /*?? throw new ArgumentNullException(nameof(TEntity))*/;
     }
 
-    public virtual Task<TEntity?> Get(TGuid id)
-    {
-        Options!.SearchId = id;  // this is ugly - how to elegant pass that parameter?
-        return GetFirstOrDefaultAsync<TEntity>(predicate: Options?.Predicate!,
-              orderyBy: Options?.OrderyBy!,
-              include: Options?.Include!,
-              disableTracking: Options?.DisableTracking ?? true);
-    }
+    public virtual Task<TEntity?> Get(TGuid id) => throw new NotImplementedException("Implementation should be inside derived specific class");
 
-    public Task<IEnumerable<TEntity>> GetAll(Expression<Func<TEntity, bool>> predicate = null!)
-    {
-        Options!.Predicate = predicate;
-        return ToListAsync(predicate: Options?.Predicate!,
-              orderyBy: Options?.OrderyBy!,
-              include: Options?.Include!,
-              disableTracking: Options?.DisableTracking ?? true);
-    }
+    public virtual Task<IEnumerable<TEntity>> GetAll(string tagName, string searchTerm) => throw new NotImplementedException("Implementation should be inside derived specific class");
     //------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     public void Add(TEntity entity)
     {
@@ -76,9 +38,9 @@ public class EFCoreRepository<TEntity, TGuid> : IRepository<TEntity, TGuid> wher
         throw new NotImplementedException();
     }
 
-    private async Task<IEnumerable<TEntity>> ToListAsync(Expression<Func<TEntity, bool>> predicate = null,
+    protected async Task<IEnumerable<TEntity>> ToListAsync(Expression<Func<TEntity, bool>> predicate = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderyBy = null,
-        Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
+        Expression<Func<TEntity, object>> include = null,
         bool disableTracking = true)
     {
         IQueryable<TEntity> query = DbSet;
@@ -88,8 +50,7 @@ public class EFCoreRepository<TEntity, TGuid> : IRepository<TEntity, TGuid> wher
         }
         if (include is not null)
         {
-            //query = include(query);
-            query = include(query);
+            query = query.Include(include);
         }
         if (predicate is not null)
         {
@@ -110,7 +71,7 @@ public class EFCoreRepository<TEntity, TGuid> : IRepository<TEntity, TGuid> wher
         throw new NotImplementedException();
     }
 
-    protected Task<TEntity?> AlterGetFirstOrDefaultAsync<TResult>(Expression<Func<TEntity, bool>> predicate = null,
+    protected Task<TEntity?> GetFirstOrDefaultAsync<TResult>(Expression<Func<TEntity, bool>> predicate = null,
         Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderyBy = null,
         Expression<Func<TEntity, object>> include = null,
         bool disableTracking = true)
@@ -132,28 +93,5 @@ public class EFCoreRepository<TEntity, TGuid> : IRepository<TEntity, TGuid> wher
             ? query.FirstOrDefaultAsync()
             : orderyBy(query).FirstOrDefaultAsync();
 
-    }
-
-    protected Task<TEntity?> GetFirstOrDefaultAsync<TResult>(Expression<Func<TEntity, bool>> predicate = null,
-        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderyBy = null,
-        Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>> include = null,
-        bool disableTracking = true)
-    {
-        IQueryable<TEntity> query = DbSet;
-        if (disableTracking)
-        {
-            query = query.AsNoTracking();
-        }
-        if (include is not null)
-        {
-            query = include(query);
-        }
-        if (predicate is not null)
-        {
-            query = query.Where(predicate);
-        }
-        return orderyBy is null
-            ? query.FirstOrDefaultAsync()
-            : orderyBy(query).FirstOrDefaultAsync();
     }
 }

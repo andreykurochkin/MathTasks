@@ -16,10 +16,8 @@ public class MathTaskGetByIdHandler : IRequestHandler<MathTaskGetByIdQuery, Math
 {
     private readonly IMapper _mapper;
     private readonly IRepository<MathTask, Guid> _repository;
-    //private readonly MathTaskRepository _repository;
 
     public MathTaskGetByIdHandler(IMapper mapper, IRepository<MathTask, Guid> repository)
-    //public MathTaskGetByIdHandler(IMapper mapper, MathTaskRepository repository)
         => (_mapper, _repository) = (mapper, repository);
 
     public async Task<MathTaskViewModel> Handle(MathTaskGetByIdQuery request, CancellationToken cancellationToken)

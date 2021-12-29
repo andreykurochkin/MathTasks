@@ -12,7 +12,7 @@ public interface IRepository<TEntity, TGuid>
 
     // Read
     Task<TEntity?> Get(TGuid id);
-    Task<IEnumerable<TEntity>> GetAll(Expression<Func<TEntity, bool>> prediate = null!);
+    Task<IEnumerable<TEntity>> GetAll(string tagName, string searchTerm);
     IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> prediate);
 
     // Delete
