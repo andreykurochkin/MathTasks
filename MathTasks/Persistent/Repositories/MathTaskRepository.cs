@@ -18,7 +18,7 @@ public class MathTaskRepository : EFCoreRepository<MathTask, Guid>
         disableTracking: true
         );
 
-    public override Task<IEnumerable<MathTask>> GetAll(string tagName, string searchTerm) => ToListAsync(
+    public override Task<IEnumerable<MathTask>> GetAll(string tagName = "", string searchTerm = "") => ToListAsync(
         predicate: new MathTaskByTagNameAndSearchTermSpecification(tagName, searchTerm).ToExpression(),
         include: new MathTaskIncludeTagsSpecification().ToExpression(),
         disableTracking: true

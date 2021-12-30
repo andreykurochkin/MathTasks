@@ -1,36 +1,49 @@
-﻿using MathTasks.Persistent.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
-using FluentAssertions;
+﻿using Xunit;
 using Microsoft.EntityFrameworkCore;
-using Moq;
-using MathTasks.Models;
-using Kurochkin.Persistence.UnitOfWork;
+using MathTasks.Tests.Infrastructure.Fixtures;
+using MathTasks.Persistent.Repositories;
+using FluentAssertions;
+using System.Linq;
+using System;
 
 namespace MathTasks.Tests;
 
-public class MathTaskRepositoryTests
+public class MathTaskRepositoryTests : IClassFixture<MathTaskRepositoryFixture>
 {
-    //private readonly MathTaskRepository _sut;
-    private const string dataBaseName = "testDataBase";
-    
-    public MathTaskRepositoryTests()
+    private readonly MathTaskRepository? _sut;
+    public MathTaskRepositoryTests(MathTaskRepositoryFixture fixture)
     {
-        var optionsBuilder = new DbContextOptionsBuilder<DbContext>();
-        optionsBuilder.UseInMemoryDatabase(dataBaseName);
-        using var _dbContext = new DbContext(optionsBuilder.Options);
-        //_sut = new MathTaskRepository(_dbContext);
+        _sut = fixture.Create();
     }
 
     [Fact]
-    public void MembersOfConfigureOptions_ShouldBeInitialized_AfterConstructingInstanceOfRepository()
+    [Trait("Category", "Unit")]
+    public void MathTaskRepository_ShouldBeCreated()
     {
-        //var result = _sut.ConfigureOptions.Include;
+        _sut.Should().NotBeNull();
+    }
 
-        //result.Should().NotBeNull();
+    [Fact]
+    [Trait("Category", "Unit")]
+    public async void GetAll_ShouldReturnTwoItems_WhenDataIsValid()
+    {
+        const int expected = 2;
+
+        var result = (await _sut!.GetAll()).Count();
+
+        result.Should().Be(expected);
+    }
+
+    [Fact, Trait("Category", "Unit")]
+    public async void Get_ShouldReturnItem_WithThemeFranceAndTwoTags()
+    {
+        const string id = "93a448b8-3c02-4a70-b973-373cf4dc29bd";
+        const string themeExpected = "Canada";
+        const int tagsCountExpected = 2;
+
+        var result = await _sut!.Get(Guid.Parse(id));
+
+        result!.Theme.Should().Be(themeExpected);
+        result!.Tags.Count.Should().Be(tagsCountExpected);
     }
 }

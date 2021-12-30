@@ -17,7 +17,7 @@ public class EFCoreRepository<TEntity, TGuid> : IRepository<TEntity, TGuid> wher
     }
 
     public virtual Task<TEntity?> Get(TGuid id) => throw new NotImplementedException("Implementation should be inside derived specific class");
-
+    
     public virtual Task<IEnumerable<TEntity>> GetAll(string tagName, string searchTerm) => throw new NotImplementedException("Implementation should be inside derived specific class");
     //------------------------------------------------------
 
@@ -92,4 +92,6 @@ public class EFCoreRepository<TEntity, TGuid> : IRepository<TEntity, TGuid> wher
             : orderyBy(query).FirstOrDefaultAsync();
 
     }
+
+    
 }

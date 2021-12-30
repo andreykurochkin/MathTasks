@@ -24,11 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Kurohkin.UnitOfWork\Kurochkin.Persistence.UnitOfWork.csproj" />
     <ProjectReference Include="..\MathTasks\MathTasks.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Infrastructure\Helpers\" />
   </ItemGroup>
 
 </Project>
