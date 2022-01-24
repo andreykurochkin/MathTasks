@@ -21,18 +21,18 @@ public class Cluster<T>
     private List<List<T>> CreateClusters(IEnumerable<T> items)
     {
         var clusters = new List<List<T>>();
-        var orderedItems = items.OrderBy(_options.OnMember).ToList();
+        var orderedItems = items.OrderBy(_options.OnMember!).ToList();
         if (orderedItems.Any())
         {
-            var min = orderedItems.Min(_options.OnMember);
-            var max = orderedItems.Max(_options.OnMember) + min;
+            var min = orderedItems.Min(_options.OnMember!);
+            var max = orderedItems.Max(_options.OnMember!) + min;
             var completeRange = max - min;
             var groupRange = completeRange / (double)_options.UpperBoundOfClusters;
             var cluster = new List<T>();
             var currentRange = min + groupRange;
             for (int i = 0; i < orderedItems.Count; i++)
             {
-                while (_options.OnMember(orderedItems.ToArray()[i]) > currentRange)
+                while (_options.OnMember!(orderedItems.ToArray()[i]) > currentRange)
                 {
                     clusters.Add(cluster);
                     cluster = new List<T>();
