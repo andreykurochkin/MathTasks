@@ -13,7 +13,7 @@ namespace MathTasks.Infrastructure.Mappers.Base
             var profiles = GetProfiles().ToList();
             return new MapperConfiguration(cfg =>
                 cfg.AddProfiles(GetProfiles()
-                    .Select(profile => (Profile)Activator.CreateInstance(profile)))
+                    .Select(profile => (Profile)Activator.CreateInstance(profile)!))
             );
         }
 

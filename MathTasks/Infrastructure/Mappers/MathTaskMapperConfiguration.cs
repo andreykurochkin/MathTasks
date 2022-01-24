@@ -53,9 +53,9 @@ namespace MathTasks.Infrastructure.Mappers
         public int Resolve(MathTask source, MathTaskEditViewModel destination, int destMember, ResolutionContext context) => source.Tags is null ? 0 : source.Tags.Count;
     }
 
-    public class TagsCustomResolver : IValueResolver<MathTask, MathTaskEditViewModel, IEnumerable<string>>
+    public class TagsCustomResolver : IValueResolver<MathTask, MathTaskEditViewModel, IEnumerable<string>?>
     {
-        public IEnumerable<string> Resolve(MathTask source, MathTaskEditViewModel destination, IEnumerable<string> destMember, ResolutionContext context) => 
+        public IEnumerable<string> Resolve(MathTask source, MathTaskEditViewModel destination, IEnumerable<string>? destMember, ResolutionContext context) => 
             source.Tags is null 
             ? Enumerable.Empty<string>() 
             : source.Tags.Select(x => x.Name);

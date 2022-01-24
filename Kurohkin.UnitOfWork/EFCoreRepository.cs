@@ -36,9 +36,9 @@ public class EFCoreRepository<TEntity, TGuid> : IRepository<TEntity, TGuid> wher
         throw new NotImplementedException();
     }
 
-    protected async Task<IEnumerable<TEntity>> ToListAsync(Expression<Func<TEntity, bool>> predicate = null,
-        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderyBy = null,
-        Expression<Func<TEntity, object>> include = null,
+    protected async Task<IEnumerable<TEntity>> ToListAsync(Expression<Func<TEntity, bool>> predicate = null!,
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderyBy = null!,
+        Expression<Func<TEntity, object>> include = null!,
         bool disableTracking = true)
     {
         IQueryable<TEntity> query = DbSet;
@@ -69,9 +69,9 @@ public class EFCoreRepository<TEntity, TGuid> : IRepository<TEntity, TGuid> wher
         throw new NotImplementedException();
     }
 
-    protected Task<TEntity?> GetFirstOrDefaultAsync<TResult>(Expression<Func<TEntity, bool>> predicate = null,
-        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderyBy = null,
-        Expression<Func<TEntity, object>> include = null,
+    protected Task<TEntity?> GetFirstOrDefaultAsync<TResult>(Expression<Func<TEntity, bool>> predicate = null!,
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderyBy = null!,
+        Expression<Func<TEntity, object>> include = null!,
         bool disableTracking = true)
     {
         IQueryable<TEntity> query = DbSet;

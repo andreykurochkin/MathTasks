@@ -10,8 +10,8 @@ namespace MathTasks.ViewModels {
     /// manages roles within single user
     /// </summary>
     public class ChangeRoleViewModel {
-        public string UserId { get; set; }
-        public string UserEmail { get; set; }
+        public string UserId { get; set; } = null!;
+        public string UserEmail { get; set; } = null!;
         public List<IdentityRole> AllRoles { get; set; }
         public IEnumerable<string> UserRoles { get; set; }
         public ChangeRoleViewModel() {

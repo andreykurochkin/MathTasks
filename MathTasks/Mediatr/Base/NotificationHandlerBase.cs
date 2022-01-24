@@ -40,7 +40,7 @@ namespace MathTasks.Mediatr.Base
                     addressFrom: notification.AddressFrom, 
                     addressTo: notification.AddressTo
                 );
-                await _context.Notifications.AddAsync(entity, cancellationToken);
+                await _context.Notifications!.AddAsync(entity, cancellationToken);
                 await _context.SaveChangesAsync();
                 _logger.NotificationAdded(notification.Subject);
             }

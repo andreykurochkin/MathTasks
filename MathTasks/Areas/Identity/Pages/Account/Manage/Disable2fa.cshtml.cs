@@ -23,7 +23,7 @@ namespace MathTasks.Areas.Identity.Pages.Account.Manage
         }
 
         [TempData]
-        public string StatusMessage { get; set; }
+        public string? StatusMessage { get; set; }
 
         public async Task<IActionResult> OnGet()
         {

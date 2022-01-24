@@ -10,8 +10,8 @@ namespace MathTasks.ViewModels {
     /// manages content associated with the specific user
     /// </summary>
     public class UserContentViewModel {
-        public string UserId { get; set; }
-        public string UserEmail { get; set; }
-        public IEnumerable<MathTask> MathTasks { get; set; }
+        public string UserId { get; set; } = null!;
+        public string UserEmail { get; set; } = null!;
+        public IEnumerable<MathTask> MathTasks { get; set; } = null!;
     }
 }

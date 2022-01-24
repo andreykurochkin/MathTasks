@@ -91,7 +91,7 @@ namespace MathTasks.Data
             if (
                 (updatedAt is not null)
                 && (updatedAt.CurrentValue is not null) 
-                && (DateTime.Parse(updatedAt.CurrentValue.ToString()).Year < 1970)
+                && (DateTime.Parse(updatedAt.CurrentValue.ToString()!).Year < 1970)
                 )
             {
                 entry.Property(nameof(IAuditable.UpdatedAt)).CurrentValue = providers.Item2.ToDateTime();

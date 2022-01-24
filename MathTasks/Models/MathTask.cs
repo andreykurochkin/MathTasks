@@ -13,7 +13,7 @@ namespace MathTasks.Models
         public string Theme { get; set; } = null!;
 
         public string Content { get; set; } = null!;
-        public ICollection<Tag> Tags { get; set; }
+        public ICollection<Tag> Tags { get; set; } = null!;
         public MathTask()
         {
 

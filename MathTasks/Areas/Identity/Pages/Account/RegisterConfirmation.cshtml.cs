@@ -21,13 +21,13 @@ namespace MathTasks.Areas.Identity.Pages.Account
             _sender = sender;
         }
 
-        public string Email { get; set; }
+        public string Email { get; set; } = null!;
 
         public bool DisplayConfirmAccountLink { get; set; }
 
-        public string EmailConfirmationUrl { get; set; }
+        public string EmailConfirmationUrl { get; set; } = null!;
 
-        public async Task<IActionResult> OnGetAsync(string email, string returnUrl = null)
+        public async Task<IActionResult> OnGetAsync(string email, string returnUrl = null!)
         {
             if (email == null)
             {
@@ -50,9 +50,9 @@ namespace MathTasks.Areas.Identity.Pages.Account
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                 EmailConfirmationUrl = Url.Page(
                     "/Account/ConfirmEmail",
-                    pageHandler: null,
+                    pageHandler: null!,
                     values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                    protocol: Request.Scheme);
+                    protocol: Request.Scheme)!;
             }
 
             return Page();

@@ -31,18 +31,18 @@ namespace MathTasks.Areas.Identity.Pages.Account.Manage
             _urlEncoder = urlEncoder;
         }
 
-        public string SharedKey { get; set; }
+        public string SharedKey { get; set; } = null!;
 
-        public string AuthenticatorUri { get; set; }
-
-        [TempData]
-        public string[] RecoveryCodes { get; set; }
+        public string AuthenticatorUri { get; set; } = null!;
 
         [TempData]
-        public string StatusMessage { get; set; }
+        public string[] RecoveryCodes { get; set; } = null!;
+
+        [TempData]
+        public string StatusMessage { get; set; } = null!;
 
         [BindProperty]
-        public InputModel Input { get; set; }
+        public InputModel Input { get; set; } = null!;
 
         public class InputModel
         {
@@ -50,7 +50,7 @@ namespace MathTasks.Areas.Identity.Pages.Account.Manage
             [StringLength(7, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Text)]
             [Display(Name = "Verification Code")]
-            public string Code { get; set; }
+            public string Code { get; set; } = null!;
         }
 
         public async Task<IActionResult> OnGetAsync()

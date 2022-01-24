@@ -39,7 +39,7 @@ namespace MathTasks.Tests
         {
             source = null;
             
-            Action act = () => source.ToRandomList();
+            Action act = () => source!.ToRandomList();
 
             act.Should().Throw<Exception>();
         }

@@ -24,11 +24,11 @@ public class StartupEntities
 
     private bool IsSeeded()
     {
-        if (_context?.Tags.Count() != 0)
+        if (_context?.Tags!.Count() != 0)
         {
             return true;
         }
-        if (_context.MathTasks.Count() != 0)
+        if (_context.MathTasks!.Count() != 0)
         {
             return true;
         }
@@ -41,8 +41,8 @@ public class StartupEntities
         {
             return;
         }
-        _context?.Tags.AddRange(_tags);
-        _context?.MathTasks.AddRange(_mathTasks);
+        _context?.Tags!.AddRange(_tags);
+        _context?.MathTasks!.AddRange(_mathTasks);
         _context?.SaveChanges();
     }
     private void InitializeNavigationProperties() => _mathTasks.ForEach(t => t.Tags = _tags.ToRandomList());
