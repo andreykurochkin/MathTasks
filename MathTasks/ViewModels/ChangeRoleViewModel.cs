@@ -19,4 +19,11 @@ namespace MathTasks.ViewModels {
             UserRoles = new List<string>();
         }
     }
+
+    //public class IdentityUserViewModel
+    //{
+    //    public string Id { get; set; }
+    //    public string Email { get; set; }
+    //    public string Role { get; set; }
+    //}
 }
