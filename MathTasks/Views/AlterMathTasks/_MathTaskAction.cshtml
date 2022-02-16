@@ -4,7 +4,6 @@
 @model Guid
 @{
     bool? isAuthenticatedUser = User?.Identity?.IsAuthenticated;
-    bool? isAdministrator = User?.IsInRole(IdentityEntities.AdministratorRoleName);
     bool Validate = true; /*isAdministrator && isAdministrator;*/
 }
 

@@ -7,16 +7,9 @@ public static class Stores
 {
     public static class ClaimsStore
     {
-        public static class Names
+        public static IEnumerable<Claim> AllClaims()
         {
-            public const string CreateRole = "Create Role";
-        }
-
-        public static readonly Claim CreateRole = new Claim(Names.CreateRole, false.ToString());
-
-        public static IEnumerable<Claim> GetClaims()
-        {
-            yield return CreateRole;
+            yield return new Claim("IsAdmin", "False");
         }
     }
 }

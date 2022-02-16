@@ -7,20 +7,22 @@
 
 <h1>All Users</h1>
 
-@{bool AnyUserExists = Model.Any(); }
+@{
+    bool UsersIsNullOrEmpty = ((Model is null) || (Model!.Any()));  
+}
 
-@if (!AnyUserExists) {
+@if (UsersIsNullOrEmpty) {
     <div class="card">
         <div class="card-header">No users created</div>
     </div>
 }
 
-@if (AnyUserExists) {
+@if (!UsersIsNullOrEmpty) {
     <table class="table">
         <tr>
             <th>Email</th>
         </tr>
-        @foreach (var user in Model) {
+        @foreach (var user in Model!) {
             <tr>
                 <td>@user.Email</td>
                 <td>

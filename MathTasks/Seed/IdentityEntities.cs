@@ -5,117 +5,78 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using static MathTasks.Authorization.Stores;
 
 namespace MathTasks.Seed;
 
 public class IdentityEntities
 {
-    public const string AdministratorRoleName = "Administrator";
-    public const string RegisteredUserRoleName = "RegisteredUser";
-    public const string AdministratorUserEmail = "dev@gmail.com";
+    public const string AdministratorUserEmail = "admin@gmail.com";
     public const string RegisteredUserEmail = "registeredUser@gmail.com";
+    public const string DefaultPassword = "123qwe!@#";
     private readonly ApplicationDbContext? _applicationDbContext;
     private readonly UserManager<IdentityUser> _userManager;
     private readonly UserStore<IdentityUser> _userStore;
-    private readonly RoleStore<IdentityRole> _roleStore;
     public IdentityEntities(ApplicationDbContext? applicationDbContext, UserManager<IdentityUser> userManager)
     {
         _applicationDbContext = applicationDbContext;
         _userManager = userManager;
-        _roleStore = new RoleStore<IdentityRole>(_applicationDbContext);
         _userStore = new UserStore<IdentityUser>(_applicationDbContext);
     }
 
-    public IEnumerable<string> RoleNames
+    public IEnumerable<string> GetUserEmails()
     {
-        get
-        {
-            yield return AdministratorRoleName;
-            yield return RegisteredUserRoleName;
-        }
-    }
-
-    public IEnumerable<string> UserEmails
-    {
-        get
-        {
-            yield return AdministratorUserEmail;
-            yield return RegisteredUserEmail;
-        }
-    }
-
-    private async Task<bool> IsSeeded()
-    {
-        if (await HasUserWithSpecifiedEmail(AdministratorUserEmail))
-        {
-            return true;
-        }
-
-        if (await HasUserWithSpecifiedEmail(RegisteredUserEmail))
-        {
-            return true;
-        }
-
-        return false;
+        yield return AdministratorUserEmail;
+        yield return RegisteredUserEmail;
     }
 
     public async Task Seed()
     {
-        // 1. Validate
-        if (await IsSeeded())
+        foreach (var email in GetUserEmails())
         {
-            return;
-        }
-
-        // 2. Validate roles and Create roles
-        foreach (var roleName in RoleNames)
-        {
-            if (!(await IsValidRoleName(_applicationDbContext!, roleName)))
+            var userFound = await _userStore.FindByEmailAsync(email.ToUpper()) is not null;
+            if (userFound)
             {
                 continue;
             }
-            var identityResult = await _roleStore.CreateAsync(CreateIdentityRole(roleName));
+            var user = IdentityUserFactory.CreateIdentityUser(email, DefaultPassword);
+            var identityResult = await _userStore.CreateAsync(user);
             if (!identityResult.Succeeded)
             {
                 throw new Exception(string.Join(", ", identityResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
             }
+            var claims = (email == AdministratorUserEmail) 
+                ? ClaimsFactory.CreateAdminClaims() 
+                : ClaimsFactory.CreateRegisteredUserClaims();
+            await _userManager.AddClaimsAsync(user, claims);
         }
-
-        // 3. Validate user name Create users
-        foreach (var email in UserEmails)
-        {
-            if (!(await HasUserWithSpecifiedEmail(email)))
-            {
-                continue;
-            }
-            var identityResult = await _userStore.CreateAsync(CreateIdentityUser(email));
-            if (!identityResult.Succeeded)
-            {
-                throw new Exception(string.Join(", ", identityResult.Errors.Select(e => $"{e.Code}: {e.Description}")));
-            }
-        }
-
-        // 4. Add roles to user
-        var administrator = await _userStore.FindByEmailAsync(AdministratorUserEmail.ToUpper());
-        await _userManager.AddToRolesAsync(administrator, RoleNames);
-
-        // 5. Add roles to user
-        var registeredUser = await _userStore.FindByEmailAsync(AdministratorUserEmail.ToUpper());
-        await _userManager.AddToRoleAsync(registeredUser, AdministratorRoleName);
-
-        await _applicationDbContext!.SaveChangesAsync();
     }
 
-    private static async Task<bool> IsValidRoleName(IdentityDbContext context, string roleName) => !(await context.Roles.AnyAsync(role => role.Name == roleName));
-
-    private static IdentityRole CreateIdentityRole(string roleName) => new(roleName) { NormalizedName = roleName.ToUpper() };
-
-    private async Task<bool> HasUserWithSpecifiedEmail(string email) => !await _applicationDbContext!.Users.AnyAsync(u => u.Email == email);
-
-    private static IdentityUser CreateIdentityUser(string email)
+    internal static class ClaimsFactory
     {
-        var user = new IdentityUser()
+        internal static IEnumerable<Claim> CreateAdminClaims() => new Claim[] 
+        { 
+            new Claim("IsAdmin", "True") 
+        };
+
+        internal static IEnumerable<Claim> CreateRegisteredUserClaims() => new Claim[] 
+        { 
+            new Claim("IsAdmin", "False") 
+        };
+    }
+
+    internal static class IdentityUserFactory
+    {
+        internal static IdentityUser CreateIdentityUser(string email, string password)
+        {
+            var user = NewUser(email);
+            user.PasswordHash = new PasswordHasher<IdentityUser>().HashPassword(user, password);
+            return user;
+        }
+
+        private static IdentityUser NewUser(string email) => new IdentityUser()
         {
             Email = email,
             EmailConfirmed = true,
@@ -124,8 +85,5 @@ public class IdentityEntities
             SecurityStamp = Guid.NewGuid().ToString("D"),
             NormalizedUserName = email.ToUpper(),
         };
-        user.PasswordHash = new PasswordHasher<IdentityUser>().HashPassword(user, "123qwe!@#");
-        return user;
     }
-
 }
