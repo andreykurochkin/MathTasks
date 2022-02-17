@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using static MathTasks.Authorization.Stores;
 
 namespace MathTasks.Seed;
 

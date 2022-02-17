@@ -1,29 +1,40 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using System.Linq;
-using System;
 using System.Threading.Tasks;
 using MathTasks.Data;
 using System.Net;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using MathTasks.ViewModels;
+using MediatR;
+using MathTasks.Controllers.Administration.Queries;
+using Microsoft.EntityFrameworkCore;
+using System.Collections;
+using System.Collections.Generic;
+using System;
 
-namespace MathTasks.Controllers;
+namespace MathTasks.Controllers.Administration;
 
 //[Authorize(Roles ="Administrator")]
 public class AdministrationController : Controller
 {
     private readonly UserManager<IdentityUser> _userManager;
     private readonly ApplicationDbContext _context;
+    private readonly IMediator _mediator;
 
-    public AdministrationController(UserManager<IdentityUser> userManager, ApplicationDbContext context)
+    public AdministrationController(UserManager<IdentityUser> userManager, ApplicationDbContext context, IMediator mediator)
     {
         _userManager = userManager;
         _context = context;
+        _mediator = mediator;
     }
 
-    [HttpGet]
-    public IActionResult Index() => View(_userManager.Users);
+    public async Task<IActionResult> Index()
+    {
+        var source = await _userManager.Users.ToListAsync();
+        var query = new GetIdentityUserViewModelsQuery(source);
+        var result = await _mediator.Send(query);
+        return View(result);
+    }
 
     public async Task<IActionResult> DeleteUser(string? id)
     {
@@ -36,7 +47,7 @@ public class AdministrationController : Controller
         var result = await _userManager.DeleteAsync(user);
         if (!result.Succeeded)
         {
-            result.Errors.ToList().ForEach(_ => ModelState.AddModelError(String.Empty, $"code: {_.Code}; description: {_.Description}"));
+            result.Errors.ToList().ForEach(_ => ModelState.AddModelError(string.Empty, $"code: {_.Code}; description: {_.Description}"));
             return View("ListUsers", _userManager.Users);
         }
         return View("ListUsers", _userManager.Users);

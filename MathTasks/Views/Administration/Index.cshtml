@@ -1,5 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Identity;
-@model IEnumerable<IdentityUser>
+@model IEnumerable<IdentityUserViewModel>
 
 @{
     ViewBag.Title = "All Users";
@@ -8,7 +8,7 @@
 <h1>All Users</h1>
 
 @{
-    bool UsersIsNullOrEmpty = ((Model is null) || (Model!.Any()));
+    bool UsersIsNullOrEmpty = ((Model is null) || !(Model!.Any()));
 }
 
 @if (UsersIsNullOrEmpty)
@@ -28,13 +28,14 @@ else
         @foreach (var user in Model!)
         {
             <tr>
-                <td></td>
                 <td>@Html.DisplayFor(_ => user.Id)</td>
                 <td>@Html.DisplayFor(_ => user.Email)</td>
-                <td>@Html.DisplayFor(_ => user.)</td>
+                <td>@Html.DisplayFor(_ => user.RoleName)</td>
 
                 <td>
-                    @*<a asp-aciton="EditUser" asp-route-id="@user.Id"*@
+                    <a asp-aciton="Details" asp-route-id="@user.Id">Details</a> |
+                    <a asp-aciton="Edit" asp-route-id="@user.Id">Edit</a> |
+                    <a asp-aciton="Delete" asp-route-id="@user.Id">Delete</a>
                 </td>
             </tr>
         }

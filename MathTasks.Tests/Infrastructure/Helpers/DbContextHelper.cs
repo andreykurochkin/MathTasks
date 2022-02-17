@@ -20,7 +20,14 @@ public class DbContextHelper
 
         Context.Database.EnsureDeleted();
 
-        Context.AddRange(MathTaskHelper.GetMany());
+        try
+        {
+            Context.AddRange(MathTaskHelper.GetMany());
+        }
+        catch (Exception)
+        {
+            //throw;
+        }
         Context.SaveChanges();
     }
 }
