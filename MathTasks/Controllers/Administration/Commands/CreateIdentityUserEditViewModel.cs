@@ -10,29 +10,29 @@ using System.Threading.Tasks;
 
 namespace MathTasks.Controllers.Administration.Commands;
 
-public record CreateEditIdentityUserViewModelCommand(IdentityUser IdentityUser) : IRequest<EditIdentityUserViewModel?>;
+public record CreateIdentityUserEditViewModelCommand(IdentityUser IdentityUser) : IRequest<IdentityUserEditViewModel?>;
 
-public class CreateEditIdentityUserViewModelCommandHandler : IRequestHandler<CreateEditIdentityUserViewModelCommand, EditIdentityUserViewModel?>
+public class CreateIdentityUserEditViewModelCommandHandler : IRequestHandler<CreateIdentityUserEditViewModelCommand, IdentityUserEditViewModel?>
 {
     private readonly UserManager<IdentityUser> _userManager;
 
-    public CreateEditIdentityUserViewModelCommandHandler(UserManager<IdentityUser> userManager)
+    public CreateIdentityUserEditViewModelCommandHandler(UserManager<IdentityUser> userManager)
     {
         _userManager = userManager;
     }
-    public async Task<EditIdentityUserViewModel?> Handle(CreateEditIdentityUserViewModelCommand request, CancellationToken cancellationдToken)
+    public async Task<IdentityUserEditViewModel?> Handle(CreateIdentityUserEditViewModelCommand request, CancellationToken cancellationдToken)
     {
         if (request.IdentityUser is null)
         {
-            return await Task.FromResult<EditIdentityUserViewModel?>(null);
+            return await Task.FromResult<IdentityUserEditViewModel?>(null);
         }
         var model = CreateModel(request.IdentityUser, await _userManager.GetClaimsAsync(request.IdentityUser));
         return model;
     }
 
-    private EditIdentityUserViewModel CreateModel(IdentityUser identityUser, IList<Claim> claims)
+    private IdentityUserEditViewModel CreateModel(IdentityUser identityUser, IList<Claim> claims)
     {
-        var model = new EditIdentityUserViewModel
+        var model = new IdentityUserEditViewModel
         {
             Id = identityUser.Id,
             Email = identityUser.Email,

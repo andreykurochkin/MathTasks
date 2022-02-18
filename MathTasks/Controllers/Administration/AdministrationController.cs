@@ -41,13 +41,13 @@ public class AdministrationController : Controller
     public async Task<IActionResult> Edit(string? id)
     {
         var source = await _userManager.FindByIdAsync(id);
-        var query = new CreateEditIdentityUserViewModelCommand(source);
+        var query = new CreateIdentityUserEditViewModelCommand(source);
         var result = await _mediator.Send(query, HttpContext.RequestAborted);
         return result is null ? RedirectToAction(nameof(Index)) : View(result);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Edit(EditIdentityUserViewModel model)
+    public async Task<IActionResult> Edit(IdentityUserEditViewModel model)
     {
         if (!ModelState.IsValid)
         {
@@ -88,7 +88,7 @@ public class AdministrationController : Controller
             Response.StatusCode = (int)HttpStatusCode.NotFound;
             return View("NotFoundIdentityUser");
         }
-        var viewModel = new EditIdentityUserViewModel
+        var viewModel = new IdentityUserEditViewModel
         {
             Id = user.Id,
             Email = user.Email,

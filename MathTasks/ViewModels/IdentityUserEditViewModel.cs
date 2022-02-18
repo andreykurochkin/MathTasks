@@ -4,7 +4,7 @@ using System.Security.Claims;
 
 namespace MathTasks.ViewModels
 {
-    public class EditIdentityUserViewModel
+    public class IdentityUserEditViewModel
     {
         public string Id { get; set; } = null!;
 
