@@ -23,6 +23,8 @@ namespace MathTasks.Infrastructure.Mappers
                 .ForMember(dest => dest.Id, options => options.MapFrom(source => source.Item1.Id))
                 .ForMember(dest => dest.Email, options => options.MapFrom(source => source.Item1.Email))
                 .ForMember(dest => dest.IsAdmin, options => options.MapFrom<IsAdminResolver>());
+
+            CreateMap<IdentityUserEditViewModel, IdentityUser>();
         }
 
         internal class IsAdminResolver : IValueResolver<Tuple<IdentityUser, IList<Claim>>, IdentityUserEditViewModel, bool>

@@ -51,9 +51,16 @@ public class AdministrationController : Controller
     {
         if (!ModelState.IsValid)
         {
-
+            return View(model);
         }
-        return View(model);
+        var query = new UpdateIdentityUserCommand(model);
+        var result = await _mediator.Send(query, HttpContext.RequestAborted);
+        if (result is null)
+        {
+            ModelState.AddModelError(string.Empty, "Error on edit user. User was deleted before your update");
+            return View(model);
+        }
+        return RedirectToAction(nameof(Index));
     }
 
     private bool GetIsAdminClaimValue(IList<Claim> claims)
