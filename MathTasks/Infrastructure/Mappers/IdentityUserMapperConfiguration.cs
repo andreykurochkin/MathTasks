@@ -11,7 +11,7 @@ using System.Security.Claims;
 namespace MathTasks.Infrastructure.Mappers
 {
     public class IdentityUserMapperConfiguration : MapperConfigurationBase
-    {   
+    {
         public IdentityUserMapperConfiguration()
         {
             CreateMap<Tuple<IdentityUser, IList<Claim>>, IdentityUserViewModel>()
@@ -19,8 +19,21 @@ namespace MathTasks.Infrastructure.Mappers
                 .ForMember(destination => destination.Email, options => options.MapFrom(source => source.Item1.Email))
                 .ForMember(destination => destination.RoleName, options => options.MapFrom<RoleNameResolver>());
 
-            //CreateMap<Tuple<IdentityUser, IList<Claim>>, IdentityUserEditViewModel
+            CreateMap<Tuple<IdentityUser, IList<Claim>>, IdentityUserEditViewModel>()
+                .ForMember(dest => dest.Id, options => options.MapFrom(source => source.Item1.Id))
+                .ForMember(dest => dest.Email, options => options.MapFrom(source => source.Item1.Email))
+                .ForMember(dest => dest.IsAdmin, options => options.MapFrom<IsAdminResolver>());
         }
+
+        internal class IsAdminResolver : IValueResolver<Tuple<IdentityUser, IList<Claim>>, IdentityUserEditViewModel, bool>
+        {
+            public bool Resolve(Tuple<IdentityUser, IList<Claim>> source, IdentityUserEditViewModel destination, bool destMember, ResolutionContext context)
+            {
+                var claim = source.Item2.FirstOrDefault(_ => _.Type == ClaimsStore.IsAdminClaimType);
+                return claim is null ? default(bool) : bool.Parse(claim.Value);
+            }
+        }
+
         internal class RoleNameResolver : IValueResolver<Tuple<IdentityUser, IList<Claim>>, IdentityUserViewModel, string>
         {
             // todo - maybe move to Enumeration
