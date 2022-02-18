@@ -9,7 +9,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MathTasks.Controllers.Administration.Queries;
+namespace MathTasks.Controllers.Administration.Commands;
 
 public record GetIdentityUserViewModelsQuery(IEnumerable<IdentityUser> IdentityUsers) : IRequest<IEnumerable<IdentityUserViewModel>>;
 

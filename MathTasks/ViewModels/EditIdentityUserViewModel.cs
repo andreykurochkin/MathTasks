@@ -1,12 +1,16 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
 namespace MathTasks.ViewModels
 {
-    public class EditUserViewModel
+    public class EditIdentityUserViewModel
     {
         public string Id { get; set; } = null!;
+
         public string Email { get; set; } = null!;
-        public IList<Claim>? Claims { get; set; }
+        
+        [Display(Name ="Is Administrator")]
+        public bool IsAdmin { get; set; }
     }
 }

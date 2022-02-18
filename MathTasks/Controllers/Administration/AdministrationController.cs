@@ -6,11 +6,13 @@ using MathTasks.Data;
 using System.Net;
 using MathTasks.ViewModels;
 using MediatR;
-using MathTasks.Controllers.Administration.Queries;
+using MathTasks.Controllers.Administration.Commands;
 using Microsoft.EntityFrameworkCore;
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using MathTasks.Authorization;
+using System.Security.Claims;
 
 namespace MathTasks.Controllers.Administration;
 
@@ -32,8 +34,32 @@ public class AdministrationController : Controller
     {
         var source = await _userManager.Users.ToListAsync();
         var query = new GetIdentityUserViewModelsQuery(source);
-        var result = await _mediator.Send(query);
+        var result = await _mediator.Send(query, HttpContext.RequestAborted);
         return View(result);
+    }
+
+    public async Task<IActionResult> Edit(string? id)
+    {
+        var source = await _userManager.FindByIdAsync(id);
+        var query = new CreateEditIdentityUserViewModelCommand(source);
+        var result = await _mediator.Send(query, HttpContext.RequestAborted);
+        return result is null ? RedirectToAction(nameof(Index)) : View(result);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Edit(EditIdentityUserViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+
+        }
+        return View(model);
+    }
+
+    private bool GetIsAdminClaimValue(IList<Claim> claims)
+    {
+        var claim = claims.FirstOrDefault(_ => _.Type == ClaimsStore.IsAdminClaimType);
+        return claim is null ? default(bool) : bool.Parse(claim.Value);
     }
 
     public async Task<IActionResult> DeleteUser(string? id)
@@ -62,11 +88,11 @@ public class AdministrationController : Controller
             Response.StatusCode = (int)HttpStatusCode.NotFound;
             return View("NotFoundIdentityUser");
         }
-        var viewModel = new EditUserViewModel
+        var viewModel = new EditIdentityUserViewModel
         {
             Id = user.Id,
             Email = user.Email,
-            Claims = await _userManager.GetClaimsAsync(user),
+            //Claims = await _userManager.GetClaimsAsync(user),
         };
         return View(viewModel);
     }
