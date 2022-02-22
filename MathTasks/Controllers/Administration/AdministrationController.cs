@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System;
 using MathTasks.Authorization;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MathTasks.Controllers.Administration;
 
@@ -38,6 +39,7 @@ public class AdministrationController : Controller
         return View(result);
     }
 
+    [Authorize(Policy = "AdminPolicy")]
     public async Task<IActionResult> Edit(string? id)
     {
         var source = await _userManager.FindByIdAsync(id);
@@ -47,6 +49,8 @@ public class AdministrationController : Controller
     }
 
     [HttpPost]
+    [Authorize(Policy = "AdminPolicy")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(IdentityUserEditViewModel model)
     {
         if (!ModelState.IsValid)
@@ -55,12 +59,15 @@ public class AdministrationController : Controller
         }
         var query = new UpdateIdentityUserCommand(model);
         var result = await _mediator.Send(query, HttpContext.RequestAborted);
-        if (result is null)
-        {
-            ModelState.AddModelError(string.Empty, "Error on edit user. User was deleted before your update");
-            return View(model);
-        }
-        return RedirectToAction(nameof(Index));
+        return result is null
+            ? AddModelStateErrorAndReturnView("Error on edit user. User was deleted before your update", model)
+            : RedirectToAction(nameof(Index));
+    }
+
+    private IActionResult AddModelStateErrorAndReturnView(string errorMessage, IdentityUserEditViewModel model)
+    {
+        ModelState.AddModelError(string.Empty, errorMessage);
+        return View(model);
     }
 
     private bool GetIsAdminClaimValue(IList<Claim> claims)

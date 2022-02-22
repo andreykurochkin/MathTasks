@@ -30,8 +30,13 @@ public class UpdateIdentityUserCommandHandler : IRequestHandler<UpdateIdentityUs
         {
             return await Task.FromResult<IdentityUser?>(null);
         }
-        
         _mapper.Map(request.ViewModel, user);
+        await UpdateClaims(request, user);
+         return user;
+    }
+
+    private async Task UpdateClaims(UpdateIdentityUserCommand request, IdentityUser user)
+    {
         var claims = await _userManager.GetClaimsAsync(user);
         var claim = claims.FirstOrDefault(_ => _.Type == ClaimsStore.IsAdminClaimType);
         if (claim is not null)
@@ -39,7 +44,5 @@ public class UpdateIdentityUserCommandHandler : IRequestHandler<UpdateIdentityUs
             await _userManager.RemoveClaimAsync(user, claim);
         }
         await _userManager.AddClaimAsync(user, new Claim(ClaimsStore.IsAdminClaimType, request.ViewModel.IsAdmin.ToString()));
-        
-        return user;
     }
 }

@@ -1,4 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity;
+@using Microsoft.AspNetCore.Authorization;
+@inject IAuthorizationService AuthorizationService
 @model IEnumerable<IdentityUserViewModel>
 
 @{
@@ -9,6 +11,7 @@
 
 @{
     bool UsersIsNullOrEmpty = ((Model is null) || !(Model!.Any()));
+    bool UserIsAdmin = (await AuthorizationService.AuthorizeAsync(User, "AdminPolicy")).Succeeded;
 }
 
 @if (UsersIsNullOrEmpty)
@@ -24,6 +27,7 @@ else
             <th>@Html.DisplayNameFor(model => model.Id)</th>
             <th>@Html.DisplayNameFor(model => model.Email)</th>
             <th>Role</th>
+            <th>Manage</th>
         </tr>
         @foreach (var user in Model!)
         {
@@ -33,9 +37,12 @@ else
                 <td>@Html.DisplayFor(_ => user.RoleName)</td>
 
                 <td>
-                    <a asp-action="Details" asp-route-id="@user.Id">Details</a> |
-                    <a asp-action="Edit" asp-route-id="@user.Id">Edit</a> |
-                    <a asp-action="Delete" asp-route-id="@user.Id">Delete</a>
+                    <a asp-action="Details" asp-route-id="@user.Id">Details</a>
+                    @if (UserIsAdmin)
+                    {
+                        <a asp-action="Edit" asp-route-id="@user.Id"> | Edit |</a>
+                        <a asp-action="Delete" asp-route-id="@user.Id">Delete</a>
+                    }
                 </td>
             </tr>
         }

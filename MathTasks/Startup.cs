@@ -19,6 +19,8 @@ using MathTasks.Contracts;
 using MathTasks.Models;
 using MathTasks.Persistent.Repositories;
 using Kurochkin.Persistence.UnitOfWork;
+using MathTasks.Authorization.Security;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MathTasks;
 
@@ -56,6 +58,12 @@ public class Startup
         .AddDefaultTokenProviders()
         .AddDefaultUI();
 
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("AdminPolicy", policy =>
+                policy.AddRequirements(new ManageIsAdminClaimRequirement()));
+        });
+
         //MapperRegistration.GetMapperConfiguration();
         services.AddAutoMapper(typeof(Startup).Assembly);
         services.AddMediatR(typeof(Startup));
@@ -72,6 +80,8 @@ public class Startup
         services.AddTransient<IRepository<MathTask, Guid>, EFCoreRepository<MathTask, Guid>>();
 
         services.AddScoped(typeof(IRepository<MathTask, Guid>), typeof(MathTaskRepository));
+
+        services.AddSingleton<IAuthorizationHandler, IsAdminClaimIsFreeForAllHandler>();
 
         services.AddServerSideBlazor();
 
