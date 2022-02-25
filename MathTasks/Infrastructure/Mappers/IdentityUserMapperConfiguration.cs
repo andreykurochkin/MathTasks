@@ -22,9 +22,69 @@ namespace MathTasks.Infrastructure.Mappers
             CreateMap<Tuple<IdentityUser, IList<Claim>>, IdentityUserEditViewModel>()
                 .ForMember(dest => dest.Id, options => options.MapFrom(source => source.Item1.Id))
                 .ForMember(dest => dest.Email, options => options.MapFrom(source => source.Item1.Email))
-                .ForMember(dest => dest.IsAdmin, options => options.MapFrom<IsAdminResolver>());
+                .ForMember(dest => dest.IsAdmin, options => options.MapFrom<IsAdminResolver>())
+                .ForMember(dest => dest.MathTaskContentEditorClaims, options => options.MapFrom<MathTaskContentEditorClaimsResolver>());
 
             CreateMap<IdentityUserEditViewModel, IdentityUser>();
+        }
+
+        internal class MathTaskContentEditorClaimsResolver : IValueResolver<Tuple<IdentityUser, IList<Claim>>, IdentityUserEditViewModel, IList<UserClaim>?>
+        {
+            private const string CreateTitle = "Create";
+            private const string ReadTitle = "Read";
+            private const string UpdateTitle = "Update";
+            private const string DeleteTitle = "Delete";
+
+            public IList<UserClaim>? Resolve(Tuple<IdentityUser, IList<Claim>> source, IdentityUserEditViewModel destination, IList<UserClaim>? destMember, ResolutionContext context)
+            {
+                return new UserClaim[]
+                {
+                    new UserClaim
+                    {
+                        IsSelected = source.Item2.Any(_ => _.Type == ClaimsStore.CanCreateMathTask)
+                            ? bool.Parse(source.Item2.First(_ => _.Type == ClaimsStore.CanCreateMathTask).Value)
+                            : default(bool),
+                        DisplayName = CreateTitle,
+                        ClaimType = ClaimsStore.CanCreateMathTask,
+                        ClaimValue = source.Item2.Any(_ => _.Type == ClaimsStore.CanCreateMathTask)
+                            ? source.Item2.First(_ => _.Type == ClaimsStore.CanCreateMathTask).Value
+                            : default(bool).ToString()
+                    },
+                    new UserClaim
+                    {
+                        IsSelected = source.Item2.Any(_ => _.Type == ClaimsStore.CanReadMathTask)
+                            ? bool.Parse(source.Item2.First(_ => _.Type == ClaimsStore.CanReadMathTask).Value)
+                            : default(bool),
+                        DisplayName = ReadTitle,
+                        ClaimType = ClaimsStore.CanReadMathTask,
+                        ClaimValue = source.Item2.Any(_ => _.Type == ClaimsStore.CanReadMathTask)
+                            ? source.Item2.First(_ => _.Type == ClaimsStore.CanReadMathTask).Value
+                            : default(bool).ToString()
+                    },
+                    new UserClaim
+                    {
+                        IsSelected = source.Item2.Any(_ => _.Type == ClaimsStore.CanUpdateMathTask)
+                            ? bool.Parse(source.Item2.First(_ => _.Type == ClaimsStore.CanUpdateMathTask).Value)
+                            : default(bool),
+                        DisplayName = UpdateTitle,
+                        ClaimType = ClaimsStore.CanUpdateMathTask,
+                        ClaimValue = source.Item2.Any(_ => _.Type == ClaimsStore.CanUpdateMathTask)
+                            ? source.Item2.First(_ => _.Type == ClaimsStore.CanUpdateMathTask).Value
+                            : default(bool).ToString()
+                    },
+                    new UserClaim
+                    {
+                        IsSelected = source.Item2.Any(_ => _.Type == ClaimsStore.CanDeleteMathTask)
+                            ? bool.Parse(source.Item2.First(_ => _.Type == ClaimsStore.CanDeleteMathTask).Value)
+                            : default(bool),
+                        DisplayName = DeleteTitle,
+                        ClaimType = ClaimsStore.CanDeleteMathTask,
+                        ClaimValue = source.Item2.Any(_ => _.Type == ClaimsStore.CanDeleteMathTask)
+                            ? source.Item2.First(_ => _.Type == ClaimsStore.CanDeleteMathTask).Value
+                            : default(bool).ToString()
+                    }
+                };
+            }
         }
 
         internal class IsAdminResolver : IValueResolver<Tuple<IdentityUser, IList<Claim>>, IdentityUserEditViewModel, bool>

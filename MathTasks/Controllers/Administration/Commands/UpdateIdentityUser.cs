@@ -4,6 +4,7 @@ using MathTasks.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading;
@@ -31,11 +32,12 @@ public class UpdateIdentityUserCommandHandler : IRequestHandler<UpdateIdentityUs
             return await Task.FromResult<IdentityUser?>(null);
         }
         _mapper.Map(request.ViewModel, user);
-        await UpdateClaims(request, user);
-         return user;
+        var t1 = await UpdateClaims(request, user);
+        var t2 = await UpdateUserContentClaims(request, user);
+        return user;
     }
 
-    private async Task UpdateClaims(UpdateIdentityUserCommand request, IdentityUser user)
+    private async Task<IdentityResult> UpdateClaims(UpdateIdentityUserCommand request, IdentityUser user)
     {
         var claims = await _userManager.GetClaimsAsync(user);
         var claim = claims.FirstOrDefault(_ => _.Type == ClaimsStore.IsAdminClaimType);
@@ -43,6 +45,112 @@ public class UpdateIdentityUserCommandHandler : IRequestHandler<UpdateIdentityUs
         {
             await _userManager.RemoveClaimAsync(user, claim);
         }
-        await _userManager.AddClaimAsync(user, new Claim(ClaimsStore.IsAdminClaimType, request.ViewModel.IsAdmin.ToString()));
+        return await _userManager.AddClaimAsync(user, new Claim(ClaimsStore.IsAdminClaimType, request.ViewModel.IsAdmin.ToString()));
     }
+
+    private async Task<IdentityResult> UpdateUserContentClaims(UpdateIdentityUserCommand request, IdentityUser user)
+    {
+        var claimTypesToDelete = request.ViewModel.MathTaskContentEditorClaims?.Select(_ => _.ClaimType).ToArray();
+        var claimsToDelete = (await _userManager.GetClaimsAsync(user)).Where(_ => claimTypesToDelete?.Contains(_.Type) ?? false);
+        var result = await _userManager.RemoveClaimsAsync(user, claimsToDelete);
+        if (!result.Succeeded)
+        {
+            throw new Exception($"Cannot delete existing claims from the user id = {user.Id}");
+        }
+        result = await _userManager.AddClaimsAsync(user, request.ViewModel.MathTaskContentEditorClaims?.Select(_ => new Claim(_.ClaimType!, _.IsSelected.ToString())));
+        if (!result.Succeeded)
+        {
+            throw new Exception($"Cannot create claims for user id = {user.Id}");
+        }
+        return result;
+    }
+
+    // update claim value like a transaction
+    // 1. claim exists
+    // 1.1. delete claims by type
+    // 1.2. if task failed return object with error message
+    // 1.3. create new claim by type and value
+    // 1.4. if task failed return object with error message
+    // 1.5. return object with successful message
+    // 2. claim does not exist
+    // 2.1. run 1.3. create new claim by type and value
+    // 2.2. run 1.4.
+    private async Task UpdateClaim(IdentityUser identityUser, string claimType, string claimName)
+    {
+        var claimsToUpdate = (await _userManager.GetClaimsAsync(identityUser))
+            .Where(_ => ClaimsStore.GetAllClaimTypes().Contains(_.Type));
+        var tasks = new List<Task<IdentityResult>>();
+        foreach (var claim in claimsToUpdate)
+        {
+            var newClaim = new Claim("",""); //CreateClaim(UpdateIdentityUserCommand request, claim.Type);
+            tasks.Add(_userManager.ReplaceClaimAsync(identityUser, claim, newClaim));
+        }
+    }
+
+    // todo uncomment
+    //private Claim CreateClaim(UpdateIdentityUserCommand request, string ClaimType)
+    //{
+    //    if (ClaimType == ClaimsStore.IsAdminClaimType)
+    //    {
+    //        return new ClaimsFactory(request).CreateIsAdminClaim();
+    //    }
+    //    if (ClaimType == )
+    //    {
+
+    //    }
+    //    var claimValue = request.ViewModel.
+    //}
+
+    internal class ClaimsFactory
+    {
+        private readonly UpdateIdentityUserCommand _request;
+
+        internal ClaimsFactory(UpdateIdentityUserCommand request)
+        {
+            _request = request;
+        }
+
+        internal Claim CreateIsAdminClaim()
+        {
+            var value = _request.ViewModel.IsAdmin.ToString();
+            return new Claim(ClaimsStore.IsAdminClaimType, value);
+        }
+
+        private string GetClaimValueByType(IList<UserClaim> claims, string claimType) => GetUserClaimByType(claims, claimType)?.IsSelected.ToString() ?? string.Empty;
+
+        private UserClaim? GetUserClaimByType(IList<UserClaim> claims, string claimType) => claims.FirstOrDefault(_ => _.ClaimType == claimType);
+
+        internal Claim CreateCanCreateMathTaskClaim()
+        {
+            var claimType = ClaimsStore.CanCreateMathTask;
+            var value = _request.ViewModel.MathTaskContentEditorClaims?.First(_ => _.ClaimType == claimType).IsSelected.ToString();
+            return new Claim(claimType, value!);
+        }
+
+        // todo uncomment
+        //internal Claim CreateCanCreateMathTaskClaim()
+        //{
+        //    var claimType = ClaimsStore.CanCreateMathTask;
+        //    var value = _request.ViewModel.MathTaskContentEditorClaims?.First(_ => _.ClaimType == claimType).IsSelected.ToString();
+        //    return new Claim(claimType, value);
+        //}
+    }
+
+    private Task AlterVersionUpdateClaim(IdentityUser identityUser, IEnumerable<Claim> claimsToUpdate, Claim newClaim)
+    {
+        var tasks = new List<Task<IdentityResult>>();
+        foreach(var claim in claimsToUpdate)
+        {
+            tasks.Add(_userManager.ReplaceClaimAsync(identityUser, claim, newClaim));
+        }
+        return Task.WhenAll(tasks);
+    }
+
+
+}
+
+public interface ViewModelIterator
+{
+    UserClaim GetNext();
+    bool HasMore();
 }

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Security.Claims;
 
 namespace MathTasks.ViewModels
@@ -12,5 +14,16 @@ namespace MathTasks.ViewModels
         
         [Display(Name ="Is Administrator")]
         public bool IsAdmin { get; set; }
+
+        [Display(Name ="Content Editor")]
+        public IList<UserClaim>? MathTaskContentEditorClaims { get; set; }
+    }
+
+    public class UserClaim
+    {
+        public string? ClaimType { get; set; }
+        public string? ClaimValue { get; set; }
+        public bool IsSelected { get; set; }
+        public string? DisplayName { get; set; }
     }
 }
