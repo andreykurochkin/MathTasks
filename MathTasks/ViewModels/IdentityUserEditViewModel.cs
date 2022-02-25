@@ -13,7 +13,7 @@ namespace MathTasks.ViewModels
         public string Email { get; set; } = null!;
         
         [Display(Name ="Is Administrator")]
-        public bool IsAdmin { get; set; }
+        public UserClaim? IsAdmin { get; set; }
 
         [Display(Name ="Content Editor")]
         public IList<UserClaim>? MathTaskContentEditorClaims { get; set; }

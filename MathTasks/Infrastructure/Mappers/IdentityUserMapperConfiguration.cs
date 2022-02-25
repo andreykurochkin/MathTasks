@@ -87,12 +87,19 @@ namespace MathTasks.Infrastructure.Mappers
             }
         }
 
-        internal class IsAdminResolver : IValueResolver<Tuple<IdentityUser, IList<Claim>>, IdentityUserEditViewModel, bool>
+        internal class IsAdminResolver : IValueResolver<Tuple<IdentityUser, IList<Claim>>, IdentityUserEditViewModel, UserClaim?>
         {
-            public bool Resolve(Tuple<IdentityUser, IList<Claim>> source, IdentityUserEditViewModel destination, bool destMember, ResolutionContext context)
+            public UserClaim? Resolve(Tuple<IdentityUser, IList<Claim>> source, IdentityUserEditViewModel destination, UserClaim? destMember, ResolutionContext context)
             {
                 var claim = source.Item2.FirstOrDefault(_ => _.Type == ClaimsStore.IsAdminClaimType);
-                return claim is null ? default(bool) : bool.Parse(claim.Value);
+                var newClaim = new UserClaim
+                {
+                    ClaimType = ClaimsStore.IsAdminClaimType,
+                    ClaimValue = claim is null ? default(bool).ToString() : claim.Value,
+                    IsSelected = false,
+                    DisplayName = string.Empty
+                };
+                return newClaim;
             }
         }
 
