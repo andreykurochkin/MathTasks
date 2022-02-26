@@ -21,4 +21,12 @@ public static class UserClaimsHelper
         yield return GetOne();
         yield return GetOne(ClaimsStore.CanCreateMathTask);
     }
+
+    public static IEnumerable<UserClaim> GetManyWithoutIsAdmin()
+    {
+        yield return GetOne(ClaimsStore.CanCreateMathTask);
+        yield return GetOne(ClaimsStore.CanReadMathTask);
+        yield return GetOne(ClaimsStore.CanUpdateMathTask);
+        yield return GetOne(ClaimsStore.CanDeleteMathTask);
+    }
 }
