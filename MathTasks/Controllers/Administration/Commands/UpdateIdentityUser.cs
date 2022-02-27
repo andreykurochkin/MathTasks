@@ -148,27 +148,3 @@ public class UpdateIdentityUserCommandHandler : IRequestHandler<UpdateIdentityUs
 
 
 }
-
-public interface UserClaimIterator : IEnumerator<UserClaim> { }
-
-public class DefaultUserClaimIterator : IEnumerator<UserClaim>
-{
-    public UserClaim Current => throw new NotImplementedException();
-
-    object System.Collections.IEnumerator.Current => throw new NotImplementedException();
-
-    public void Dispose()
-    {
-        throw new NotImplementedException();
-    }
-
-    public bool MoveNext()
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Reset()
-    {
-        throw new NotImplementedException();
-    }
-}
