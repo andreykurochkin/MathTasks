@@ -50,7 +50,7 @@ public class AdministrationController : Controller
 
     [HttpPost]
     [Authorize(Policy = "AdminPolicy")]
-    [ValidateAntiForgeryToken]
+    //[ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(IdentityUserEditViewModel model)
     {
         if (!ModelState.IsValid)

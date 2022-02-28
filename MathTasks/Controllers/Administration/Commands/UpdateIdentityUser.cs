@@ -31,11 +31,67 @@ public class UpdateIdentityUserCommandHandler : IRequestHandler<UpdateIdentityUs
         {
             return await Task.FromResult<IdentityUser?>(null);
         }
-        _mapper.Map(request.ViewModel, user);
-        var t1 = await UpdateClaims(request, user);
-        //var t2 = await UpdateUserContentClaims(request, user);
+
+        //_mapper.Map(request.ViewModel, user);
+        //// UpdateClaimsInStore(IEnumerable<UserClaim> userClaims, IdentityUser user, IEnumerable<Claim> claims) // call expected here
+        //var t1 = await UpdateClaims(request, user);
+        ////var t2 = await UpdateUserContentClaims(request, user);
+        //return user; // should return some object with user and errors, each tagged to specific claim types
+
+        //await UpdateClaimsInStore(request.ViewModel.ToList(), user, await _userManager.GetClaimsAsync(user));
         return user;
     }
+
+    private async Task UpdateClaimsInStore(IEnumerable<UserClaim> userClaims, IdentityUser user, IEnumerable<Claim> claims)
+    {
+        var tasks = new List<Task<IdentityResult>>();
+        foreach (var userClaim in userClaims)
+        {
+            var claimsToUpdate = claims.Where(_ => _.Type == userClaim.ClaimType);
+            var newClaimValue = GetAggregateUserClaimValue(userClaim.ClaimType!, userClaims);
+            var newClaim = new Claim(userClaim.ClaimType!, newClaimValue);
+            foreach (var claim in claimsToUpdate)
+            {
+                tasks.Add(_userManager.ReplaceClaimAsync(user, claim, newClaim));
+            }
+        }
+        Task t = Task.WhenAll(tasks);
+
+        try
+        {
+            await t;
+        }
+        catch (Exception)
+        { }
+    }
+
+    private string GetAggregateUserClaimValue(string type, IEnumerable<UserClaim> userClaims)
+    {
+        if (userClaims is null)
+        {
+            return default(bool).ToString();
+        }
+        if (!userClaims.Any())
+        {
+            return default(bool).ToString();
+        }
+        var filter = userClaims.Where(_ => _.ClaimType == type);
+        var filterValuesAsBool = filter.Select(_ => _.IsSelected);
+        var result = filterValuesAsBool.Aggregate((first, second) => first && second);
+        return result.ToString();
+    }
+
+
+
+
+
+
+
+
+
+
+
+
 
     private async Task<IdentityResult> UpdateClaims(UpdateIdentityUserCommand request, IdentityUser user)
     {
@@ -82,7 +138,7 @@ public class UpdateIdentityUserCommandHandler : IRequestHandler<UpdateIdentityUs
         var tasks = new List<Task<IdentityResult>>();
         foreach (var claim in claimsToUpdate)
         {
-            var newClaim = new Claim("",""); //CreateClaim(UpdateIdentityUserCommand request, claim.Type);
+            var newClaim = new Claim("", ""); //CreateClaim(UpdateIdentityUserCommand request, claim.Type);
             tasks.Add(_userManager.ReplaceClaimAsync(identityUser, claim, newClaim));
         }
     }
@@ -139,7 +195,7 @@ public class UpdateIdentityUserCommandHandler : IRequestHandler<UpdateIdentityUs
     private Task AlterVersionUpdateClaim(IdentityUser identityUser, IEnumerable<Claim> claimsToUpdate, Claim newClaim)
     {
         var tasks = new List<Task<IdentityResult>>();
-        foreach(var claim in claimsToUpdate)
+        foreach (var claim in claimsToUpdate)
         {
             tasks.Add(_userManager.ReplaceClaimAsync(identityUser, claim, newClaim));
         }
