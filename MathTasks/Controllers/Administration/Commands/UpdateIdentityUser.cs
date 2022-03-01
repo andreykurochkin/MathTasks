@@ -3,6 +3,7 @@ using MathTasks.Authorization;
 using MathTasks.ViewModels;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,11 +19,13 @@ public class UpdateIdentityUserCommandHandler : IRequestHandler<UpdateIdentityUs
 {
     private readonly UserManager<IdentityUser> _userManager;
     private readonly IMapper _mapper;
+    private readonly ILogger<UpdateIdentityUserCommandHandler> _logger;
 
-    public UpdateIdentityUserCommandHandler(UserManager<IdentityUser> userManager, IMapper mapper)
+    public UpdateIdentityUserCommandHandler(UserManager<IdentityUser> userManager, IMapper mapper, ILogger<UpdateIdentityUserCommandHandler> logger)
     {
         _userManager = userManager;
         _mapper = mapper;
+        _logger = logger;
     }
     public async Task<IdentityUser?> Handle(UpdateIdentityUserCommand request, CancellationToken cancellationToken)
     {
@@ -32,34 +35,178 @@ public class UpdateIdentityUserCommandHandler : IRequestHandler<UpdateIdentityUs
             return await Task.FromResult<IdentityUser?>(null);
         }
 
-        //_mapper.Map(request.ViewModel, user);
-        //// UpdateClaimsInStore(IEnumerable<UserClaim> userClaims, IdentityUser user, IEnumerable<Claim> claims) // call expected here
-        //var t1 = await UpdateClaims(request, user);
-        ////var t2 = await UpdateUserContentClaims(request, user);
-        //return user; // should return some object with user and errors, each tagged to specific claim types
-
-        //await UpdateClaimsInStore(request.ViewModel.ToList(), user, await _userManager.GetClaimsAsync(user));
+        _mapper.Map(request.ViewModel, user);
+        IEnumerable<UserClaim> userClaims = new EnumeratorIdentityUserEditViewModel(request.ViewModel).ToList();
+        //await SequentualUpdateClaimsInStore(new EnumeratorIdentityUserEditViewModel(request.ViewModel), user, await _userManager.GetClaimsAsync(user));
+        // todo process here
+        await UpdateClaims(
+            user: user,
+            claimProvider: new DefaultClaimProvider(userClaims),
+            func: UpdateClaimLogged);
         return user;
+
     }
 
+    private async Task SequentualUpdateClaimsInStore(IEnumerable<UserClaim> userClaims, IdentityUser user, IEnumerable<Claim> claims)
+    {
+        var logId = Guid.NewGuid().ToString();
+        _logger.LogDebug($"{logId}: start {nameof(UpdateClaimsInStore)}");
+        var tasks = new List<IdentityResult>();
+        var indexedUserClaims = userClaims.Select((item, index) => new { index, item });
+        foreach (var indexedUserClaim in indexedUserClaims)
+        {
+            _logger.LogDebug($"{logId}: {indexedUserClaim.index}) start");
+            var claimsToUpdate = claims.Where(_ => _.Type == indexedUserClaim.item.ClaimType).ToList();
+            var newClaimValue = GetAggregateUserClaimValue(indexedUserClaim.item.ClaimType!, userClaims);
+            _logger.LogDebug($"{logId}: {indexedUserClaim.index}) aggregate value {newClaimValue}");
+            _logger.LogDebug($"{logId} claim type {indexedUserClaim.item.ClaimType}");
+            var newClaim = new Claim(indexedUserClaim.item.ClaimType!, newClaimValue);
+            foreach (var claim in claimsToUpdate)
+            {
+                tasks.Add(await _userManager.ReplaceClaimAsync(user, claim, newClaim));
+            }
+            _logger.LogDebug($"{logId}: {indexedUserClaim.index}) stop");
+        }
+        tasks.ForEach(_ => _logger.LogDebug($"{logId}: taskResult: {_.Succeeded}"));
+    }
+
+    private async Task AlterUpdateClaims(IdentityUser user, IClaimProvider claimProvider)
+    {
+        var claims = await _userManager.GetClaimsAsync(user);
+        foreach (var claim in claims)
+        {
+            var newClaim = claimProvider.Create(claim.Type);
+            if (newClaim is not null)
+            {
+                await UpdateClaim(user!, claim!, newClaim);
+            }
+        }
+    }
+
+    private async Task UpdateClaims(IdentityUser user, IClaimProvider claimProvider, Func<IdentityUser, Claim, Claim, Task<IdentityResult>>  func)
+    {
+        var claims = await _userManager.GetClaimsAsync(user);
+        foreach (var claim in claims)
+        {
+            var newClaim = claimProvider.Create(claim.Type);
+            if (newClaim is not null)
+            {
+                await func(user!, claim!, newClaim);
+            }
+        }
+    }
+
+    internal interface IClaimProvider
+    {
+        Claim? Create(string type);
+    }
+
+    internal class DefaultClaimProvider : IClaimProvider
+    {
+        private readonly IEnumerable<UserClaim>? _userClaims;
+
+        public DefaultClaimProvider(IEnumerable<UserClaim> userClaims) => _userClaims = userClaims;
+
+        public Claim? Create(string type)
+        {
+            var value = GetAggregateUserClaimValue(type);
+            return (value is null) ? null : new Claim(type, value);
+        }
+
+        private string GetAggregateUserClaimValue(string type)
+        {
+            if (_userClaims is null)
+            {
+                return default(bool).ToString();
+            }
+            if (!_userClaims.Any())
+            {
+                return default(bool).ToString();
+            }
+            var filter = _userClaims.Where(_ => _.ClaimType == type);
+            var filterValuesAsBool = filter.Select(_ => _.IsSelected);
+            var result = filterValuesAsBool.Aggregate((first, second) => first && second);
+            return result.ToString();
+        }
+    }
+
+    private Task<IdentityResult> UpdateClaim(IdentityUser user, Claim claim, Claim newClaim)
+    {
+        return _userManager.ReplaceClaimAsync(user, claim, newClaim);
+    }
+
+    private async Task<IdentityResult> UpdateClaimLogged(IdentityUser user, Claim claim, Claim newClaim)
+    {
+        _logger.LogDebug($"start claim update");
+        _logger.LogDebug($"update data: old claim type:{claim.Type}; value: {claim.Value}");
+        _logger.LogDebug($"update data: new claim type:{newClaim.Type}; value: {newClaim.Value}");
+        var result = await UpdateClaim(user, claim, newClaim);
+        if (result.Succeeded)
+        {
+            _logger.LogDebug($"end claim update");
+        }
+        else
+        {
+            PrintErrors(_logger, result.Errors);
+        }
+        return result;
+    }
+
+
+
+    private void PrintErrors<T>(ILogger<T> logger, IEnumerable<IdentityError> errors)
+    {
+        if (errors == null)
+        {
+            return;
+        }
+        if (!errors.Any())
+        {
+            return;
+        }
+        logger.LogDebug($"found {errors.Count()} as follows:");
+        errors.Select((error, index) => new {index, error})
+            .ToList()
+            .ForEach(_ => logger.LogDebug($"{_.index}) code: {_.error.Code}, description: {_.error.Description}"));
+    }
+
+    /// <summary>
+    /// that one raises error because of parallel access to dbContext
+    /// </summary>
+    /// <param name="userClaims"></param>
+    /// <param name="user"></param>
+    /// <param name="claims"></param>
+    /// <returns></returns>
     private async Task UpdateClaimsInStore(IEnumerable<UserClaim> userClaims, IdentityUser user, IEnumerable<Claim> claims)
     {
+        var logId = Guid.NewGuid().ToString();
+        _logger.LogDebug($"{logId}: start {nameof(UpdateClaimsInStore)}");
         var tasks = new List<Task<IdentityResult>>();
-        foreach (var userClaim in userClaims)
+        var indexedUserClaims = userClaims.Select((item, index) => new { index, item });
+        foreach (var indexedUserClaim in indexedUserClaims)
         {
-            var claimsToUpdate = claims.Where(_ => _.Type == userClaim.ClaimType);
-            var newClaimValue = GetAggregateUserClaimValue(userClaim.ClaimType!, userClaims);
-            var newClaim = new Claim(userClaim.ClaimType!, newClaimValue);
+            _logger.LogDebug($"{logId}: {indexedUserClaim.index}) start");
+            var claimsToUpdate = claims.Where(_ => _.Type == indexedUserClaim.item.ClaimType).ToList();
+            var newClaimValue = GetAggregateUserClaimValue(indexedUserClaim.item.ClaimType!, userClaims);
+            _logger.LogDebug($"{logId}: {indexedUserClaim.index}) aggregate value {newClaimValue}");
+            _logger.LogDebug($"{logId} claim type {indexedUserClaim.item.ClaimType}");
+            var newClaim = new Claim(indexedUserClaim.item.ClaimType!, newClaimValue);
             foreach (var claim in claimsToUpdate)
             {
                 tasks.Add(_userManager.ReplaceClaimAsync(user, claim, newClaim));
             }
+            _logger.LogDebug($"{logId}: {indexedUserClaim.index}) stop");
         }
         Task t = Task.WhenAll(tasks);
 
         try
         {
             await t;
+            _logger.LogDebug($"{logId}: task results:");
+            foreach (var task in tasks)
+            {
+                _logger.LogDebug($"{logId}: task results: {task.Status}");
+            }
         }
         catch (Exception)
         { }
@@ -101,7 +248,7 @@ public class UpdateIdentityUserCommandHandler : IRequestHandler<UpdateIdentityUs
         {
             await _userManager.RemoveClaimAsync(user, claim);
         }
-        return await _userManager.AddClaimAsync(user, new Claim(ClaimsStore.IsAdminClaimType, request.ViewModel.IsAdmin.IsSelected.ToString()));
+        return await _userManager.AddClaimAsync(user, new Claim(ClaimsStore.IsAdminClaimType, request.ViewModel.IsAdmin?.IsSelected.ToString() ?? default(bool).ToString()));
     }
 
     private async Task<IdentityResult> UpdateUserContentClaims(UpdateIdentityUserCommand request, IdentityUser user)
@@ -168,8 +315,8 @@ public class UpdateIdentityUserCommandHandler : IRequestHandler<UpdateIdentityUs
 
         internal Claim CreateIsAdminClaim()
         {
-            var value = _request.ViewModel.IsAdmin.ToString();
-            return new Claim(ClaimsStore.IsAdminClaimType, value);
+            var value = _request.ViewModel.IsAdmin?.ToString() ?? default(bool).ToString();
+            return new Claim(ClaimsStore.IsAdminClaimType, value.ToString());
         }
 
         private string GetClaimValueByType(IList<UserClaim> claims, string claimType) => GetUserClaimByType(claims, claimType)?.IsSelected.ToString() ?? string.Empty;

@@ -42,8 +42,10 @@ public class IdentityUserEditViewModelTests
 
     [Theory]
     [MemberData(nameof(GetData))]
-    public void Enumerator_ShouldReturnExpectedAmountOfItems_WhenDataIsValid(IdentityUserEditViewModel sut, int expected)
+    public void Enumerator_ShouldReturnExpectedAmountOfItems_WhenDataIsValid(IdentityUserEditViewModel viewModel, int expected)
     {
+        var sut = new EnumeratorIdentityUserEditViewModel(viewModel);
+
         var result = sut.Count();
          
         result.Should().Be(expected);
