@@ -3,6 +3,7 @@ using MathTasks.Mediatr.Base;
 using Microsoft.Extensions.Logging;
 using System;
 using MathTasks.Providers;
+using MathTasks.Infrastructure.Providers;
 
 namespace MathTasks.Mediatr
 {

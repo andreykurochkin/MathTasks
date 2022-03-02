@@ -15,6 +15,8 @@ using MathTasks.Persistent.Repositories;
 using Kurochkin.Persistence.UnitOfWork;
 using MathTasks.Authorization.Security;
 using Microsoft.AspNetCore.Authorization;
+using MathTasks.Providers;
+using MathTasks.Infrastructure.Providers.Base;
 
 namespace MathTasks;
 
@@ -76,6 +78,9 @@ public class Startup
         services.AddScoped(typeof(IRepository<MathTask, Guid>), typeof(MathTaskRepository));
 
         services.AddSingleton<IAuthorizationHandler, IsAdminClaimIsFreeForAllHandler>();
+
+        //services.AddTransient<IClaimProvider, DefaultClaimProvider>();
+        services.AddScoped(typeof(ICommandHandler<AggregateUserClaimValue, bool>), typeof(AggregateValueHandler));
 
         services.AddServerSideBlazor();
 

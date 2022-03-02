@@ -1,6 +1,7 @@
-﻿using MathTasks.Models.Base;
+﻿using MathTasks.Infrastructure.Providers;
+using MathTasks.Infrastructure.Providers.Base;
+using MathTasks.Models.Base;
 using MathTasks.Providers;
-using MathTasks.Providers.Base;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;

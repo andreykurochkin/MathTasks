@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using MathTasks.Providers;
+using MathTasks.Infrastructure.Providers;
 
 namespace MathTasks.Mediatr
 {
