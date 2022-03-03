@@ -91,6 +91,7 @@ namespace MathTasks.Infrastructure.Mappers
         {
             public UserClaim? Resolve(Tuple<IdentityUser, IList<Claim>> source, IdentityUserEditViewModel destination, UserClaim? destMember, ResolutionContext context)
             {
+                const string IsAdmin = "Is Admin";
                 var claim = source.Item2.FirstOrDefault(_ => _.Type == ClaimsStore.IsAdminClaimType);
                 var claimValue = claim is null ? default(bool).ToString() : claim.Value;
                 var newClaim = new UserClaim
@@ -98,7 +99,7 @@ namespace MathTasks.Infrastructure.Mappers
                     ClaimType = ClaimsStore.IsAdminClaimType,
                     ClaimValue = claimValue,
                     IsSelected = bool.Parse(claimValue),
-                    DisplayName = string.Empty
+                    DisplayName = IsAdmin
                 };
                 return newClaim;
             }

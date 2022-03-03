@@ -1,12 +1,12 @@
 ﻿@using Microsoft.JSInterop
-<span class="btn btn-link" @onclick="(_ => CopyToClipboard(LinkValue))" title="Copy link to math task">Link</span>
+<span class="btn btn-link" @onclick="(_ => CopyToClipboard(LinkValue!))" title="Copy link to math task">Link</span>
 
 @code {
-    [Parameter] public string LinkValue { get; set; }
-    [Inject] IJSRuntime JSRuntime { get; set; }
+    [Parameter] public string? LinkValue { get; set; }
+    [Inject] IJSRuntime? JSRuntime { get; set; }
     protected async Task CopyToClipboard(string value)
     {
-        var interop = new RazorInterop(JSRuntime);
+        var interop = new RazorInterop(JSRuntime!);
         await interop.CopyToClipboard(value);
         await interop.ShowToast(value, "Copy that", "success");
     }

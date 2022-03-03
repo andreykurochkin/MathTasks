@@ -31,17 +31,25 @@ public class AggregateValueHandler : ICommandHandler<AggregateUserClaimValue, bo
             var result = func(command);
             if (result)
             {
-                return default(bool);
+                return false;
             }
         }
         return true;
     }
 
+    private bool AlterIsValid(AggregateUserClaimValue command) =>
+        command?.UserClaims?.Any() ?? false;
+
     public bool Handle(AggregateUserClaimValue command)
     {
-        if (!IsValid(command))
+        //if (!IsValid(command))
+        //{
+        //    return false;
+        //}
+        var foo = AlterIsValid(command);
+        if (!(command?.UserClaims?.Any() ?? false))
         {
-            return default(bool);
+            return false;
         }
         var query = command.UserClaims.Where(_ => _.ClaimType == command.ClaimType)
             .Select(_ => _.IsSelected);

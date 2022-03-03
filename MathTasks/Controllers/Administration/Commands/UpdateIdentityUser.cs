@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MathTasks.Authorization;
+using MathTasks.Infrastructure.Helpers;
 using MathTasks.Infrastructure.Providers.Base;
 using MathTasks.Providers;
 using MathTasks.ViewModels;
@@ -50,29 +51,6 @@ public class UpdateIdentityUserCommandHandler : IRequestHandler<UpdateIdentityUs
 
     }
 
-    private async Task SequentualUpdateClaimsInStore(IEnumerable<UserClaim> userClaims, IdentityUser user, IEnumerable<Claim> claims)
-    {
-        var logId = Guid.NewGuid().ToString();
-        _logger.LogDebug($"{logId}: start {nameof(SequentualUpdateClaimsInStore)}");
-        var tasks = new List<IdentityResult>();
-        var indexedUserClaims = userClaims.Select((item, index) => new { index, item });
-        foreach (var indexedUserClaim in indexedUserClaims)
-        {
-            _logger.LogDebug($"{logId}: {indexedUserClaim.index}) start");
-            var claimsToUpdate = claims.Where(_ => _.Type == indexedUserClaim.item.ClaimType).ToList();
-            var newClaimValue = GetAggregateUserClaimValue(indexedUserClaim.item.ClaimType!, userClaims);
-            _logger.LogDebug($"{logId}: {indexedUserClaim.index}) aggregate value {newClaimValue}");
-            _logger.LogDebug($"{logId} claim type {indexedUserClaim.item.ClaimType}");
-            var newClaim = new Claim(indexedUserClaim.item.ClaimType!, newClaimValue);
-            foreach (var claim in claimsToUpdate)
-            {
-                tasks.Add(await _userManager.ReplaceClaimAsync(user, claim, newClaim));
-            }
-            _logger.LogDebug($"{logId}: {indexedUserClaim.index}) stop");
-        }
-        tasks.ForEach(_ => _logger.LogDebug($"{logId}: taskResult: {_.Succeeded}"));
-    }
-
     private async Task UpdateClaims(IdentityUser user, IEnumerable<UserClaim> userClaims, Func<IdentityUser, Claim, Claim, Task<IdentityResult>> func)
     {
         var claims = await _userManager.GetClaimsAsync(user);
@@ -109,7 +87,7 @@ public class UpdateIdentityUserCommandHandler : IRequestHandler<UpdateIdentityUs
         }
         else
         {
-            PrintErrors(_logger, result.Errors);
+            OutputHelper.PrintErrors(_logger.LogDebug, result.Errors);
         }
         return result;
     }
@@ -128,21 +106,5 @@ public class UpdateIdentityUserCommandHandler : IRequestHandler<UpdateIdentityUs
         errors.Select((error, index) => new { index, error })
             .ToList()
             .ForEach(_ => logger.LogDebug($"{_.index}) code: {_.error.Code}, description: {_.error.Description}"));
-    }
-
-    private string GetAggregateUserClaimValue(string type, IEnumerable<UserClaim> userClaims)
-    {
-        if (userClaims is null)
-        {
-            return default(bool).ToString();
-        }
-        if (!userClaims.Any())
-        {
-            return default(bool).ToString();
-        }
-        var filter = userClaims.Where(_ => _.ClaimType == type);
-        var filterValuesAsBool = filter.Select(_ => _.IsSelected);
-        var result = filterValuesAsBool.Aggregate((first, second) => first && second);
-        return result.ToString();
     }
 }

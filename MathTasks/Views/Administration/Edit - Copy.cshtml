@@ -42,13 +42,15 @@
                 </div>
             }
         </div>
-        <div class="form-group row">
+         <div class="form-group row">
             @await Component.InvokeAsync("UserClaims", new UserClaim[] { Model.IsAdmin})
         </div>
         <div class="form-group row">
             <label asp-for="MathTaskContentEditorClaims" class="col-sm-2 form-lable">Content Editor</label>
             <hr />
-            @await Component.InvokeAsync("UserClaims", Model.MathTaskContentEditorClaims)
+            @*<div>*@
+                @await Component.InvokeAsync("UserClaims", Model.MathTaskContentEditorClaims)
+            @*</div>*@
         </div>
         <div class="form-group">
             <input name="Save" type="submit" class="btn btn-primary" />

@@ -1,0 +1,31 @@
+﻿@model IList<UserClaim>
+
+@{
+    var modelIsNullOrEmpty = Model is null || !Model!.Any();
+}
+
+@if (modelIsNullOrEmpty)
+{
+    <p>No Claim found</p>
+}
+else
+{
+    @for (var i = 0; i < Model!.Count; i++)
+    {
+        <input type="hidden" asp-for="@Model[i].ClaimType" />
+        <input type="hidden" asp-for="@Model[i].ClaimValue" />
+        <label asp-for="@Model[i].DisplayName" class="col-sm-2">@Model[i].DisplayName</label>
+        <div class="col-sm-10">
+            <input type="checkbox" asp-for="@Model[i].IsSelected" />
+        </div>
+    }
+    @*@for (var i = 0; i < Model!.MathTaskContentEditorClaims!.Count; i++)
+        {
+        <input type="hidden" asp-for="@Model.MathTaskContentEditorClaims[i].ClaimType" />
+        <input type="hidden" asp-for="@Model.MathTaskContentEditorClaims[i].ClaimValue" />
+        <label asp-for="@Model.MathTaskContentEditorClaims[i].DisplayName" class="col-sm-2">@Model.MathTaskContentEditorClaims[i].DisplayName</label>
+        <div class="col-sm-10">
+        <input type="checkbox" asp-for="@Model.MathTaskContentEditorClaims[i].IsSelected" />
+        </div>
+        }    *@
+}
